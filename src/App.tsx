@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 type Role = "customer" | "agent" | "philippines";
+type BoxSize = "xtraLarge" | "large" | "medium" | "small";
 
 type OfflineAction = {
   id: string;
@@ -47,6 +48,22 @@ const customerNotifications = [
   "Your box is now at sea and travelling to the Philippines.",
   "Your box has arrived at the Manila hub.",
   "Delivered! Nanay & Tatay have received your box.",
+];
+
+const boxSizes: { key: BoxSize; name: string; dimensions: string }[] = [
+  { key: "xtraLarge", name: "Xtra Large", dimensions: "575 × 480 × 865 mm" },
+  { key: "large", name: "Large", dimensions: "575 × 480 × 650 mm" },
+  { key: "medium", name: "Medium", dimensions: "575 × 480 × 400 mm" },
+  { key: "small", name: "Small", dimensions: "575 × 480 × 200 mm" },
+];
+
+const aucklandRates: { zone: string; examples: string; rates: Record<BoxSize, number> }[] = [
+  { zone: "Manila", examples: "Metro Manila including Quezon City, Makati and Taguig", rates: { xtraLarge: 250, large: 150, medium: 110, small: 55 } },
+  { zone: "Luzon A", examples: "Batangas, Bulacan, Cavite, Laguna, Pampanga and more", rates: { xtraLarge: 255, large: 155, medium: 115, small: 60 } },
+  { zone: "Luzon B", examples: "Baguio, Bicol, Ilocos, Isabela, La Union and more", rates: { xtraLarge: 260, large: 160, medium: 120, small: 65 } },
+  { zone: "Islands", examples: "Catanduanes, Marinduque, Masbate, Mindoro, Palawan and Romblon", rates: { xtraLarge: 265, large: 165, medium: 125, small: 70 } },
+  { zone: "Visayas", examples: "Central, Eastern and Western Visayas", rates: { xtraLarge: 265, large: 165, medium: 130, small: 75 } },
+  { zone: "Mindanao", examples: "BARMM, Caraga, Davao, Northern Mindanao and more", rates: { xtraLarge: 270, large: 170, medium: 135, small: 80 } },
 ];
 
 const journeySteps = [
@@ -175,6 +192,18 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext }: 
           <span className="quick-icon">⌁</span><div><strong>Message your agent</strong><small>Andre usually replies quickly</small></div><i className="online" />
         </button>
       </section>
+
+      <section className="rates-guide" aria-labelledby="rates-title">
+        <div className="rates-heading"><div><p className="eyebrow">AUCKLAND SHIPPING RATES</p><h2 id="rates-title">Choose the right box for your padala.</h2><p>Indicative shipping prices from Auckland to the Philippines.</p></div><button onClick={onBook}>Book a box <span>→</span></button></div>
+        <div className="box-size-grid">
+          {boxSizes.map((box) => <article key={box.key}><span className={`box-illustration ${box.key}`} aria-hidden="true">▣</span><strong>{box.name}</strong><small>{box.dimensions}</small><b>From NZ${aucklandRates[0].rates[box.key]}</b></article>)}
+        </div>
+        <div className="rates-table-wrap">
+          <div className="rates-table rates-row rates-head"><span>Destination</span>{boxSizes.map((box) => <span key={box.key}>{box.name}</span>)}</div>
+          {aucklandRates.map((area) => <div className="rates-table rates-row" key={area.zone}><span><strong>{area.zone}</strong><small>{area.examples}</small></span>{boxSizes.map((box) => <span key={box.key}>NZ${area.rates[box.key]}</span>)}</div>)}
+        </div>
+        <p className="rates-notice">Prices are indicative “from” rates for Auckland and are subject to change without prior notice. Forex NZ confirms the final price before booking.</p>
+      </section>
     </>
   );
 }
@@ -233,6 +262,8 @@ export default function Home() {
   const [trackingStartedAt, setTrackingStartedAt] = useState<number | null>(null);
   const [trackingStartStage, setTrackingStartStage] = useState(0);
   const [customerNotification, setCustomerNotification] = useState<string | null>(null);
+  const [bookingSize, setBookingSize] = useState<BoxSize>("large");
+  const [bookingDestination, setBookingDestination] = useState("Manila");
   const [online, setOnline] = useState(true);
   const [queue, setQueue] = useState<OfflineAction[]>([]);
   const [lastSync, setLastSync] = useState<string>("Not synced yet");
@@ -241,6 +272,7 @@ export default function Home() {
   const copy = roleCopy[role];
 
   const queuedChanges = queue.length;
+  const selectedRate = aucklandRates.find((area) => area.zone === bookingDestination)?.rates[bookingSize] ?? 0;
 
   const saveAction = (type: OfflineAction["type"], label: string) => {
     const action: OfflineAction = {
@@ -421,7 +453,7 @@ export default function Home() {
 
       <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span>Powered by DASHLY · Support · Privacy · Terms</span></footer>
 
-      {booking && <div className="modal-backdrop" onMouseDown={() => setBooking(false)}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(e) => e.stopPropagation()}><button className="close" onClick={() => setBooking(false)} aria-label="Close">×</button>{confirmed ? <div className="success"><span>✓</span><p className="eyebrow">{online ? "PICKUP REQUESTED" : "SAVED OFFLINE"}</p><h2>{online ? "We’ve got you, Maria." : "Your request is safe."}</h2><p>{online ? "Andre will confirm your Auckland pickup time shortly. You’ll get an update here and by text." : "It is stored on this device and will be sent automatically when your connection returns."}</p><button onClick={() => setBooking(false)}>Back to my shipment</button></div> : <><p className="eyebrow">SEND A BOX HOME</p><h2 id="booking-title">Where should we collect it?</h2><p>Choose your box and preferred pickup. Your agent will confirm the final time.</p><div className="form-grid"><label>Pickup suburb<input defaultValue="Mount Roskill" /></label><label>Box size<select defaultValue="standard"><option value="standard">Standard · NZ$145</option><option value="jumbo">Jumbo · NZ$185</option></select></label><label>Preferred day<input type="date" defaultValue="2026-08-19" /></label><label>Time window<select><option>9am–12pm</option><option>12pm–3pm</option><option>3pm–6pm</option></select></label></div><button className="confirm" onClick={() => { saveAction("pickup-request", "Mount Roskill pickup · Standard box"); setConfirmed(true); }}>Request pickup <span>→</span></button><small className="fineprint">{online ? "No charge until your agent confirms the booking." : "No internet needed. This request will sync automatically."}</small></>}</section></div>}
+      {booking && <div className="modal-backdrop" onMouseDown={() => setBooking(false)}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(e) => e.stopPropagation()}><button className="close" onClick={() => setBooking(false)} aria-label="Close">×</button>{confirmed ? <div className="success"><span>✓</span><p className="eyebrow">{online ? "PICKUP REQUESTED" : "SAVED OFFLINE"}</p><h2>{online ? "We’ve got you, Maria." : "Your request is safe."}</h2><p>{online ? `Andre will confirm your Auckland pickup and indicative NZ$${selectedRate} shipping rate shortly.` : "It is stored on this device and will be sent automatically when your connection returns."}</p><button onClick={() => setBooking(false)}>Back to my shipment</button></div> : <><p className="eyebrow">SEND A BOX HOME</p><h2 id="booking-title">Where should we collect it?</h2><p>Choose your box and destination. Your agent will confirm the final price and pickup time.</p><div className="form-grid"><label>Pickup suburb<input defaultValue="Mount Roskill" /></label><label>Destination zone<select value={bookingDestination} onChange={(event) => setBookingDestination(event.target.value)}>{aucklandRates.map((area) => <option key={area.zone}>{area.zone}</option>)}</select></label><label>Box size<select value={bookingSize} onChange={(event) => setBookingSize(event.target.value as BoxSize)}>{boxSizes.map((box) => <option value={box.key} key={box.key}>{box.name} · {box.dimensions}</option>)}</select></label><label>Preferred day<input type="date" defaultValue="2026-08-19" /></label><label>Time window<select><option>9am–12pm</option><option>12pm–3pm</option><option>3pm–6pm</option></select></label><div className="booking-price"><span>Indicative shipping rate</span><strong>NZ${selectedRate}</strong><small>From Auckland · final price confirmed before booking</small></div></div><button className="confirm" onClick={() => { const box = boxSizes.find((item) => item.key === bookingSize); saveAction("pickup-request", `Mount Roskill pickup · ${box?.name} · ${bookingDestination} · NZ$${selectedRate}`); setConfirmed(true); }}>Request pickup <span>→</span></button><small className="fineprint">{online ? "No charge until your agent confirms the booking." : "No internet needed. This request will sync automatically."}</small></>}</section></div>}
     </main>
   );
 }
