@@ -45,6 +45,7 @@ footer .forex-brand img{width:180px;height:58px;border-radius:6px}
 .track-box button{border:0;background:var(--navy);color:white;padding:0 17px;font-weight:800}
 .track-box button span{margin-left:9px;color:var(--yellow)}
 .track-box .sample-tracking{display:block;border:0;background:transparent;color:var(--sea);padding:8px 2px 0;font-size:11px;text-align:left}
+.track-box .secondary-sample{padding-top:4px;color:var(--muted)}
 .track-box .sample-tracking strong{letter-spacing:.04em;text-decoration:underline;text-underline-offset:2px}
 .tracking-message{margin:8px 2px 0!important;font-size:11px!important;font-weight:800;line-height:1.4!important}
 .tracking-message.found{color:#16755f!important}
@@ -72,6 +73,7 @@ footer .forex-brand img{width:180px;height:58px;border-radius:6px}
 .eta strong{color:var(--navy)}
 .eta em{margin-left:auto;font-style:normal;color:var(--orange);font-weight:900}
 .timeline{display:grid;grid-template-columns:repeat(5,1fr);margin:33px 0 20px}
+.timeline.six-stages{grid-template-columns:repeat(6,1fr)}
 .milestone{position:relative;text-align:center;padding-top:28px}
 .milestone:before{content:"";position:absolute;height:2px;background:#d7dfda;left:0;right:0;top:9px}
 .milestone:first-child:before{left:50%}
@@ -450,6 +452,7 @@ body{background:linear-gradient(145deg,#dbeaf5,#f2f8fc);min-height:100vh}
 .app-home .eta strong{font-size:15px}
 .app-home .eta em{margin-left:0}
 .app-home .timeline{overflow-x:auto;grid-template-columns:repeat(5,116px);padding:6px 2px 12px;scroll-snap-type:x proximity}
+.app-home .timeline.six-stages{grid-template-columns:repeat(6,116px)}
 .app-home .milestone{scroll-snap-align:start}
 .app-home .quick-grid{grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}
 .app-home .quick-card{min-height:130px;padding:17px 14px;display:flex;align-items:flex-start;flex-direction:column;border-radius:16px;gap:10px;text-align:left}

@@ -44,6 +44,17 @@ const milestones = [
   { label: "Delivered", detail: "Quezon City", done: false },
 ];
 
+const staffShipmentMilestones = [
+  { label: "Booking confirmed", detail: "QR label generated" },
+  { label: "Collected", detail: "Auckland pickup" },
+  { label: "NZ warehouse", detail: "East Tāmaki" },
+  { label: "Container", detail: "NZ-1026-A" },
+  { label: "At sea", detail: "Auckland to Manila" },
+  { label: "Delivered", detail: "Quezon City" },
+];
+
+const staffStageToTracking: Record<StaffBookingStage, number> = { pending: 0, confirmed: 0, collected: 1, warehouse: 2, container: 3, departed: 4 };
+
 const customerNotifications = [
   "Your box has been collected in Auckland.",
   "Your box has arrived at the Forex NZ warehouse.",
@@ -154,35 +165,39 @@ function JourneyAnimation() {
   );
 }
 
-function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext }: { onBook: () => void; trackingStage: number; trackingActive: boolean; secondsToNext: number }) {
-  const delivered = trackingStage === milestones.length - 1;
-  const markerPositions = [2, 24, 52, 88, 98];
+function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext, trackingNumber, trackingResult, staffBookingStage }: { onBook: () => void; trackingStage: number; trackingActive: boolean; secondsToNext: number; trackingNumber: string; trackingResult: "idle" | "found" | "not-found"; staffBookingStage: StaffBookingStage }) {
+  const isStaffShipment = trackingResult === "found" && trackingNumber === "BB-NZ-26081042";
+  const visibleMilestones = isStaffShipment ? staffShipmentMilestones : milestones;
+  const visibleStage = isStaffShipment ? staffStageToTracking[staffBookingStage] : trackingStage;
+  const delivered = visibleStage === visibleMilestones.length - 1;
+  const markerPositions = isStaffShipment ? [2, 18, 38, 58, 82, 98] : [2, 24, 52, 88, 98];
+  const currentStatus = visibleMilestones[visibleStage];
   return (
     <>
       <section className="shipment-card" id="shipment-result">
         <div className="shipment-top">
           <div>
             <p className="label">ACTIVE SHIPMENT</p>
-            <h2>BB-NZ-04821</h2>
+            <h2>{isStaffShipment ? "BB-NZ-26081042" : "BB-NZ-04821"}</h2>
           </div>
           <span className={`status-pill ${delivered ? "delivered" : ""}`}><i /> {delivered ? "Delivered" : "In transit"}</span>
         </div>
         <div className="route-line" aria-label="Auckland to Quezon City">
           <div><span>NZ</span><strong>Auckland</strong><small>Sent by Maria</small></div>
-          <div className="ocean"><b style={{ left: `${markerPositions[trackingStage]}%` }}>✦</b></div>
+          <div className="ocean"><b style={{ left: `${markerPositions[visibleStage]}%` }}>✦</b></div>
           <div className="destination"><span>PH</span><strong>Quezon City</strong><small>For Nanay & Tatay</small></div>
         </div>
-        <div className="eta"><span>{delivered ? "Delivery confirmed" : trackingActive ? "Live shipment update" : "Current demo stage"}</span><strong>{delivered ? "Delivered to Nanay & Tatay" : trackingStage === 3 ? "Arrived at Manila hub" : milestones[trackingStage].label}</strong><em>{delivered ? "Journey complete ✓" : trackingActive ? `Next demo update in ${secondsToNext}s` : "Enter the demo number to begin"}</em></div>
-        <div className="timeline">
-          {milestones.map((item, index) => (
-            <div className={`milestone ${index <= trackingStage ? "done" : ""} ${index === trackingStage ? "current" : ""}`} key={item.label}>
-              <span className="dot">{index < trackingStage || delivered && index === trackingStage ? "✓" : index === trackingStage ? "●" : ""}</span>
+        <div className="eta"><span>{delivered ? "Delivery confirmed" : isStaffShipment ? "Live QR status" : trackingActive ? "Live shipment update" : "Current demo stage"}</span><strong>{delivered ? "Delivered to Nanay & Tatay" : currentStatus.label}</strong><em>{delivered ? "Journey complete ✓" : isStaffShipment ? "Updated by authorised staff scans" : trackingActive ? `Next demo update in ${secondsToNext}s` : "Enter the demo number to begin"}</em></div>
+        <div className={`timeline ${isStaffShipment ? "six-stages" : ""}`}>
+          {visibleMilestones.map((item, index) => (
+            <div className={`milestone ${index <= visibleStage ? "done" : ""} ${index === visibleStage ? "current" : ""}`} key={item.label}>
+              <span className="dot">{index < visibleStage || delivered && index === visibleStage ? "✓" : index === visibleStage ? "●" : ""}</span>
               <strong>{item.label}</strong>
-              <small>{index === 3 && trackingStage >= 3 ? "Received · Manila hub" : index === 4 && delivered ? "Delivered · Quezon City" : item.detail}</small>
+              <small>{item.detail}</small>
             </div>
           ))}
         </div>
-        {trackingActive && <p className="tracking-live" role="status"><i /> Live demonstration running — this shipment advances automatically every 30 seconds.</p>}
+        {isStaffShipment ? <p className="tracking-live" role="status"><i /> Connected to staff QR events — the status changes when authorised staff scan the box.</p> : trackingActive && <p className="tracking-live" role="status"><i /> Live demonstration running — this shipment advances automatically every 30 seconds.</p>}
         <button className="text-button">View full journey <span>→</span></button>
       </section>
 
@@ -489,6 +504,14 @@ export default function Home() {
       window.setTimeout(() => document.getElementById("shipment-result")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
       return;
     }
+    if (number === "BB-NZ-26081042") {
+      setTrackingResult("found");
+      setTrackingActive(false);
+      setTrackingStartedAt(null);
+      setSecondsToNext(0);
+      window.setTimeout(() => document.getElementById("shipment-result")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+      return;
+    }
     setTrackingResult("not-found");
   };
 
@@ -541,10 +564,10 @@ export default function Home() {
       <div className="page-shell" id="home">
         <section className="hero-copy">
           <div><p className="eyebrow">{copy.eyebrow}</p><h1>{copy.title}</h1><p>{copy.subtitle}</p></div>
-          {role === "customer" && <form className="track-box" onSubmit={(event) => { event.preventDefault(); trackShipment(); }}><label htmlFor="tracking">Track any box</label><div><input id="tracking" value={tracking} onChange={(e) => { setTracking(e.target.value); setTrackingResult("idle"); }} placeholder="Enter tracking number"/><button type="submit">Track <span>→</span></button></div><button className="sample-tracking" type="button" onClick={() => { setTracking("BB-NZ-04821"); setTrackingResult("idle"); }}>Use demo number: <strong>BB-NZ-04821</strong></button>{trackingResult === "found" && <p className="tracking-message found" role="status">✓ Shipment found — showing its latest journey below.</p>}{trackingResult === "not-found" && <p className="tracking-message not-found" role="alert">We couldn’t find that number. Try the demo number BB-NZ-04821.</p>}</form>}
+          {role === "customer" && <form className="track-box" onSubmit={(event) => { event.preventDefault(); trackShipment(); }}><label htmlFor="tracking">Track any box</label><div><input id="tracking" value={tracking} onChange={(e) => { setTracking(e.target.value); setTrackingResult("idle"); }} placeholder="Enter tracking number"/><button type="submit">Track <span>→</span></button></div><button className="sample-tracking" type="button" onClick={() => { setTracking("BB-NZ-26081042"); setTrackingResult("idle"); }}>Use QR workflow number: <strong>BB-NZ-26081042</strong></button><button className="sample-tracking secondary-sample" type="button" onClick={() => { setTracking("BB-NZ-04821"); setTrackingResult("idle"); }}>Use automatic demo: <strong>BB-NZ-04821</strong></button>{trackingResult === "found" && <p className="tracking-message found" role="status">✓ Shipment found — showing its latest journey below.</p>}{trackingResult === "not-found" && <p className="tracking-message not-found" role="alert">We couldn’t find that number. Try BB-NZ-26081042 or BB-NZ-04821.</p>}</form>}
         </section>
 
-        {role === "customer" ? <><CustomerView onBook={() => setBooking(true)} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} bookingStage={staffBookingStage} onConfirmBooking={confirmStaffBooking} onAdvanceBooking={advanceStaffBooking} onResetBooking={() => setStaffBookingStage("pending")} /> : <PhilippinesView bookingStage={staffBookingStage} />}
+        {role === "customer" ? <><CustomerView onBook={() => setBooking(true)} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} trackingNumber={tracking} trackingResult={trackingResult} staffBookingStage={staffBookingStage} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} bookingStage={staffBookingStage} onConfirmBooking={confirmStaffBooking} onAdvanceBooking={advanceStaffBooking} onResetBooking={() => setStaffBookingStage("pending")} /> : <PhilippinesView bookingStage={staffBookingStage} />}
 
         <section className="offline-feature" aria-labelledby="offline-title">
           <div className="offline-copy">
