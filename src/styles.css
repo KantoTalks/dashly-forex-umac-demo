@@ -65,7 +65,7 @@ footer .forex-brand img{width:180px;height:58px;border-radius:6px}
 .route-line strong{font-size:15px;color:var(--navy)}
 .route-line small{color:var(--muted);margin-top:4px}
 .ocean{height:1px;background:repeating-linear-gradient(90deg,#93aaa9 0 6px,transparent 6px 11px);position:relative;margin:0 25px}
-.ocean b{position:absolute;left:52%;top:50%;transform:translate(-50%,-50%);width:31px;height:31px;border-radius:50%;background:var(--orange);color:white;display:grid;place-items:center;border:5px solid var(--paper)}
+.ocean b{position:absolute;left:52%;top:50%;transform:translate(-50%,-50%);width:31px;height:31px;border-radius:50%;background:var(--orange);color:white;display:grid;place-items:center;border:5px solid var(--paper);transition:left .8s cubic-bezier(.25,.8,.25,1)}
 .eta{background:#edf3ef;border-radius:6px;padding:13px 17px;display:flex;gap:14px;align-items:center;font-size:12px}
 .eta span{color:var(--muted)}
 .eta strong{color:var(--navy)}

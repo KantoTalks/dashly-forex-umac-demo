@@ -129,6 +129,7 @@ function JourneyAnimation() {
 
 function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext }: { onBook: () => void; trackingStage: number; trackingActive: boolean; secondsToNext: number }) {
   const delivered = trackingStage === milestones.length - 1;
+  const markerPositions = [2, 24, 52, 88, 98];
   return (
     <>
       <section className="shipment-card" id="shipment-result">
@@ -141,10 +142,10 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext }: 
         </div>
         <div className="route-line" aria-label="Auckland to Quezon City">
           <div><span>NZ</span><strong>Auckland</strong><small>Sent by Maria</small></div>
-          <div className="ocean"><b style={{ left: trackingStage >= 3 ? "90%" : "52%" }}>✦</b></div>
+          <div className="ocean"><b style={{ left: `${markerPositions[trackingStage]}%` }}>✦</b></div>
           <div className="destination"><span>PH</span><strong>Quezon City</strong><small>For Nanay & Tatay</small></div>
         </div>
-        <div className="eta"><span>{delivered ? "Delivery confirmed" : "Estimated arrival"}</span><strong>{delivered ? "Delivered to Nanay & Tatay" : trackingStage === 3 ? "Arrived at Manila hub" : "12–15 September"}</strong><em>{delivered ? "Journey complete ✓" : trackingActive ? `Next demo update in ${secondsToNext}s` : "28 days to go"}</em></div>
+        <div className="eta"><span>{delivered ? "Delivery confirmed" : trackingActive ? "Live shipment update" : "Current demo stage"}</span><strong>{delivered ? "Delivered to Nanay & Tatay" : trackingStage === 3 ? "Arrived at Manila hub" : milestones[trackingStage].label}</strong><em>{delivered ? "Journey complete ✓" : trackingActive ? `Next demo update in ${secondsToNext}s` : "Enter the demo number to begin"}</em></div>
         <div className="timeline">
           {milestones.map((item, index) => (
             <div className={`milestone ${index <= trackingStage ? "done" : ""} ${index === trackingStage ? "current" : ""}`} key={item.label}>
@@ -218,9 +219,10 @@ export default function Home() {
   const [confirmed, setConfirmed] = useState(false);
   const [tracking, setTracking] = useState("");
   const [trackingResult, setTrackingResult] = useState<"idle" | "found" | "not-found">("idle");
-  const [trackingStage, setTrackingStage] = useState(2);
+  const [trackingStage, setTrackingStage] = useState(0);
   const [trackingActive, setTrackingActive] = useState(false);
   const [secondsToNext, setSecondsToNext] = useState(30);
+  const [trackingStartedAt, setTrackingStartedAt] = useState<number | null>(null);
   const [online, setOnline] = useState(true);
   const [queue, setQueue] = useState<OfflineAction[]>([]);
   const [lastSync, setLastSync] = useState<string>("Not synced yet");
@@ -282,20 +284,22 @@ export default function Home() {
   }, [agentDone]);
 
   useEffect(() => {
-    if (!trackingActive || trackingStage >= milestones.length - 1) return;
-    const timer = window.setInterval(() => {
-      setSecondsToNext((seconds) => {
-        if (seconds > 1) return seconds - 1;
-        setTrackingStage((stage) => {
-          const nextStage = Math.min(stage + 1, milestones.length - 1);
-          if (nextStage === milestones.length - 1) setTrackingActive(false);
-          return nextStage;
-        });
-        return 30;
-      });
-    }, 1000);
+    if (!trackingActive || trackingStartedAt === null) return;
+    const updateTracking = () => {
+      const elapsed = Date.now() - trackingStartedAt;
+      const nextStage = Math.min(Math.floor(elapsed / 30000), milestones.length - 1);
+      setTrackingStage(nextStage);
+      if (nextStage === milestones.length - 1) {
+        setSecondsToNext(0);
+        setTrackingActive(false);
+        return;
+      }
+      setSecondsToNext(30 - Math.floor((elapsed % 30000) / 1000));
+    };
+    updateTracking();
+    const timer = window.setInterval(updateTracking, 250);
     return () => window.clearInterval(timer);
-  }, [trackingActive, trackingStage]);
+  }, [trackingActive, trackingStartedAt]);
 
   const toggleCollected = (name: string) => {
     const collected = !agentDone.includes(name);
@@ -308,8 +312,9 @@ export default function Home() {
     setTracking(number);
     if (number === "BB-NZ-04821") {
       setTrackingResult("found");
-      setTrackingStage(2);
+      setTrackingStage(0);
       setSecondsToNext(30);
+      setTrackingStartedAt(Date.now());
       setTrackingActive(true);
       window.setTimeout(() => document.getElementById("shipment-result")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
       return;
