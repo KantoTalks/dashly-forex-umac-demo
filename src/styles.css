@@ -1,4 +1,4 @@
-:root{--navy:#0b2f63;--ink:#17375f;--muted:#607a99;--cream:#edf6fc;--paper:#ffffff;--orange:#36aee2;--orange-dark:#087bb9;--sea:#1769aa;--mint:#d9effc;--line:#d5e5f2;--yellow:#83d1f3}
+:root{--navy:#182c72;--ink:#233c78;--muted:#60759a;--cream:#f1f7fb;--paper:#ffffff;--orange:#3cafd8;--orange-dark:#168bb9;--sea:#182c72;--mint:#dff3fa;--line:#d3e4ef;--yellow:#fecb31;--red:#d11f2f}
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -9,6 +9,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 
 .topbar{height:78px;background:var(--paper);display:flex;align-items:center;padding:0 max(32px,calc((100vw - 1240px)/2));border-bottom:1px solid #e8e4db;position:sticky;top:0;z-index:20}
 .brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--navy);min-width:230px}
+.forex-brand{min-width:230px}
+.forex-brand img{display:block;width:205px;height:62px;object-fit:cover;object-position:center;background:white}
+.login-story .forex-brand img{width:250px;height:86px;border-radius:8px}
+footer .forex-brand img{width:180px;height:58px;border-radius:6px}
 .brand-mark{position:relative;width:36px;height:33px;display:block}
 .brand-mark i{position:absolute;background:var(--orange);display:block}
 .brand-mark i:nth-child(1){width:27px;height:27px;left:0;bottom:0;border-radius:4px}
@@ -24,7 +28,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .role-select span{font-size:11px;color:var(--muted)}
 .role-select select{border:0;background:transparent;color:var(--navy);font-size:12px;font-weight:800}
 .bell{border:0;background:transparent;color:var(--navy);font-size:25px;position:relative}
-.bell i{width:7px;height:7px;border-radius:50%;background:var(--orange);position:absolute;right:2px;top:2px}
+.bell i{width:7px;height:7px;border-radius:50%;background:var(--red);position:absolute;right:2px;top:2px}
 .avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--navy);color:white;font-size:12px;font-weight:800}
 
 .page-shell{max-width:1240px;margin:auto;padding:62px 32px 80px}
@@ -154,7 +158,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .box-shape{width:155px;height:120px;background:#d6a76c;transform:rotate(-5deg);box-shadow:14px 17px 0 rgba(0,0,0,.12);display:grid;place-items:center;color:#71451f;font-weight:900;letter-spacing:.15em;position:relative}
 .box-shape:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:33px;transform:translateX(-50%);background:#ead1a2}
 .box-shape span{z-index:1;background:#f0d7a8;padding:4px}
-.heart{position:absolute;right:23%;top:19%;background:var(--orange);border-radius:50%;width:49px;height:49px;display:grid;place-items:center;font-size:19px;box-shadow:0 0 0 8px rgba(240,100,59,.15)}
+.heart{position:absolute;right:23%;top:19%;background:var(--red);border-radius:50%;width:49px;height:49px;display:grid;place-items:center;font-size:19px;box-shadow:0 0 0 8px rgba(209,31,47,.15)}
 .trust-row{display:flex;flex-wrap:wrap;gap:16px 25px;margin-top:25px;font-size:11px;font-weight:800;color:#dce9e4}
 .trust-row span::first-letter{color:var(--yellow)}
 .network{text-align:center;margin:0 auto 20px}
@@ -316,8 +320,8 @@ footer{gap:25px;flex-wrap:wrap}
 .track-box>div,.shipment-card,.operations-card,.journey-demo,.offline-feature{border-color:#d5e5f2}
 .shipment-card,.operations-card,.journey-demo{box-shadow:0 12px 34px rgba(11,47,99,.08)}
 .status-pill,.connection-pill.is-online{color:#125f94}
-.status-pill i,.connection-pill.is-online i,.online{background:#2c9fd3}
-.status-pill i{box-shadow:0 0 0 4px rgba(44,159,211,.14)}
+.status-pill i,.connection-pill.is-online i,.online{background:var(--orange)}
+.status-pill i{box-shadow:0 0 0 4px rgba(60,175,216,.14)}
 .online{box-shadow:0 0 0 5px #e1f2fb}
 .eta,.quick-card:not(.primary) .quick-icon,.journey-stage,.access-badge,.login-tabs{background:#e7f3fb}
 .milestone.done:before,.milestone.done .dot{background:var(--sea);border-color:var(--sea)}
@@ -325,17 +329,17 @@ footer{gap:25px;flex-wrap:wrap}
 .journey-line,.ocean{--route-blue:#b8d7e9}
 .journey-line{background:#bddbea}
 .journey-icon{border-color:#c7dfed}
-.journey-points button.active .journey-icon{box-shadow:0 0 0 7px rgba(54,174,226,.14)}
+.journey-points button.active .journey-icon{box-shadow:0 0 0 7px rgba(60,175,216,.14)}
 .promise p:not(.eyebrow),.journey-caption p,.login-story>div>p:last-child{color:#c9deef}
 .journey-caption small,.login-story>small{color:#8fc4e2}
-.promise-art{background:radial-gradient(circle at 30% 20%,#2b78b6 0,transparent 32%),linear-gradient(140deg,#1769aa,#0b2f63)}
-.heart{box-shadow:0 0 0 8px rgba(54,174,226,.16)}
+.promise-art{background:radial-gradient(circle at 30% 20%,#3cafd8 0,transparent 32%),linear-gradient(140deg,#264b91,#182c72)}
+.heart{box-shadow:0 0 0 8px rgba(209,31,47,.16)}
 .trust-row,footer,.brand.light small{color:#c2d8e9}
 .network-grid div{background:rgba(255,255,255,.72);border-color:#d5e5f2}
 .modal-backdrop{background:rgba(4,24,55,.76)}
 .form-grid input,.form-grid select,.login-card input,.login-card select{border-color:#bfd6e6}
 .sync-demo{background:#e7f3fb}
-.sync-device .signal{color:#83d1f3}
+.sync-device .signal{color:var(--yellow)}
 .sync-device small{color:#c8ddeb}
 .login-tabs button.active{box-shadow:0 3px 12px rgba(11,47,99,.1)}
 
@@ -348,8 +352,8 @@ body{background:linear-gradient(145deg,#dbeaf5,#f2f8fc);min-height:100vh}
 .app-home .topbar{position:sticky;top:0;z-index:40;height:72px;padding:0 18px;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-bottom:1px solid #dce9f3}
 .app-home .topbar nav,.app-home .access-badge,.app-home .sign-out{display:none}
 .app-home .brand{min-width:0}
-.app-home .brand strong{font-size:17px;letter-spacing:.1em}
-.app-home .brand small{font-size:9px}
+.app-home .forex-brand{min-width:0}
+.app-home .forex-brand img{width:158px;height:52px}
 .app-home .header-actions{margin-left:auto;min-width:0;gap:9px}
 .app-home .connection-pill{display:inline-flex;padding:7px 9px}
 .app-home .avatar{width:36px;height:36px;font-size:10px}
@@ -414,6 +418,7 @@ body{background:linear-gradient(145deg,#dbeaf5,#f2f8fc);min-height:100vh}
 .app-home .network-grid small{font-size:10px}
 .app-home footer{padding:28px 20px 108px;display:block;text-align:center}
 .app-home footer .brand{justify-content:center;margin-bottom:14px}
+.app-home footer .forex-brand img{width:175px;height:58px}
 .app-home footer>span{display:block;margin-top:10px}
 .app-home .ops-summary{grid-template-columns:1fr 1fr 1fr;border-radius:14px}
 .app-home .ops-summary div{padding:15px 8px}

@@ -297,19 +297,19 @@ export default function Home() {
     return (
       <main className="login-page">
         <section className="login-story">
-          <a className="brand light" href="#"><span className="brand-mark"><i /><i /><i /></span><span><strong>PADALA</strong><small>NZ → PH</small></span></a>
+          <a className="brand forex-brand light" href="#" aria-label="Forex NZ Freight Forwarder"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></a>
           <div><p className="eyebrow">DASHLY SECURE ACCESS</p><h1>One platform. The right view for every person.</h1><p>Customers see only their own boxes. Authorised staff enter a separate operational workspace based on their assigned role.</p></div>
           <small>Prototype access demonstration</small>
         </section>
         <section className="login-panel" aria-labelledby="login-title">
           <div className="login-card">
-            <p className="label">WELCOME BACK</p><h2 id="login-title">Sign in to PADALA</h2><p>This demonstration shows how access will be separated in the functional MVP.</p>
+            <p className="label">WELCOME BACK</p><h2 id="login-title">Sign in to Forex NZ</h2><p>This demonstration shows how access will be separated in the functional MVP.</p>
             <div className="login-tabs" role="tablist"><button className={loginMode === "customer" ? "active" : ""} onClick={() => setLoginMode("customer")}>Customer</button><button className={loginMode === "staff" ? "active" : ""} onClick={() => setLoginMode("staff")}>Staff access</button></div>
             <label>Email address<input type="email" defaultValue={loginMode === "customer" ? "maria@example.com" : "staff@forex.example"} key={loginMode} /></label>
             <label>Password<input type="password" defaultValue="demoonly" /></label>
             {loginMode === "staff" && <label>Assigned workspace<select value={role === "customer" ? "agent" : role} onChange={(e) => setRole(e.target.value as Role)}><option value="agent">NZ Agent</option><option value="philippines">PH Operations</option></select></label>}
             <button className="login-submit" onClick={() => { if (loginMode === "customer") setRole("customer"); else if (role === "customer") setRole("agent"); setAuthenticated(true); }}>Open {loginMode === "customer" ? "customer portal" : "staff workspace"}</button>
-            <small className="login-disclosure">Demo only. Production authentication and permissions will be enforced by Supabase and database security policies.</small>
+            <small className="login-disclosure">Demo only. Production authentication and permissions will be enforced by Firebase Authentication and Firestore security rules.</small>
           </div>
         </section>
       </main>
@@ -319,7 +319,7 @@ export default function Home() {
   return (
     <main className="app-home">
       <header className="topbar">
-        <a className="brand" href="#"><span className="brand-mark"><i /><i /><i /></span><span><strong>PADALA</strong><small>NZ → PH</small></span></a>
+        <a className="brand forex-brand" href="#" aria-label="Forex NZ Freight Forwarder"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></a>
         <nav aria-label="Main navigation"><a className="active" href="#home">Home</a><a href="#journey">Shipments</a><a href="#help">Help</a></nav>
         <div className="header-actions">
           <span className={`connection-pill ${online ? "is-online" : "is-offline"}`}><i />{syncing ? "Syncing…" : online ? (queuedChanges ? `Online · ${queuedChanges} syncing` : "Online · synced") : `Offline${queuedChanges ? ` · ${queuedChanges} queued` : ""}`}</span>
@@ -353,7 +353,7 @@ export default function Home() {
         </section>
 
         <section className="promise" id="journey">
-          <div className="promise-art"><div className="box-shape"><span>PADALA</span><i /></div><div className="heart">♥</div></div>
+          <div className="promise-art"><div className="box-shape"><span>FOREX NZ</span><i /></div><div className="heart">♥</div></div>
           <div><p className="eyebrow">WALANG KABA</p><h2>No more wondering where it is.</h2><p>Every scan, handover, and journey update is shared across New Zealand and the Philippines—so you and your family always know what’s happening.</p><div className="trust-row"><span>✓ One shared record</span><span>✓ Real-time updates</span><span>✓ Local support at both ends</span></div></div>
         </section>
 
@@ -367,7 +367,7 @@ export default function Home() {
         <a href="#help"><span>◌</span><small>Support</small></a>
       </nav>
 
-      <footer><div className="brand light"><span className="brand-mark"><i /><i /><i /></span><span><strong>PADALA</strong><small>From home to home.</small></span></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span>Support · Privacy · Terms</span></footer>
+      <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span>Powered by DASHLY · Support · Privacy · Terms</span></footer>
 
       {booking && <div className="modal-backdrop" onMouseDown={() => setBooking(false)}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(e) => e.stopPropagation()}><button className="close" onClick={() => setBooking(false)} aria-label="Close">×</button>{confirmed ? <div className="success"><span>✓</span><p className="eyebrow">{online ? "PICKUP REQUESTED" : "SAVED OFFLINE"}</p><h2>{online ? "We’ve got you, Maria." : "Your request is safe."}</h2><p>{online ? "Andre will confirm your Auckland pickup time shortly. You’ll get an update here and by text." : "It is stored on this device and will be sent automatically when your connection returns."}</p><button onClick={() => setBooking(false)}>Back to my shipment</button></div> : <><p className="eyebrow">SEND A BOX HOME</p><h2 id="booking-title">Where should we collect it?</h2><p>Choose your box and preferred pickup. Your agent will confirm the final time.</p><div className="form-grid"><label>Pickup suburb<input defaultValue="Mount Roskill" /></label><label>Box size<select defaultValue="standard"><option value="standard">Standard · NZ$145</option><option value="jumbo">Jumbo · NZ$185</option></select></label><label>Preferred day<input type="date" defaultValue="2026-08-19" /></label><label>Time window<select><option>9am–12pm</option><option>12pm–3pm</option><option>3pm–6pm</option></select></label></div><button className="confirm" onClick={() => { saveAction("pickup-request", "Mount Roskill pickup · Standard box"); setConfirmed(true); }}>Request pickup <span>→</span></button><small className="fineprint">{online ? "No charge until your agent confirms the booking." : "No internet needed. This request will sync automatically."}</small></>}</section></div>}
     </main>
