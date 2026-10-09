@@ -252,6 +252,8 @@ export default function Home() {
   const [role, setRole] = useState<Role>("customer");
   const [authenticated, setAuthenticated] = useState(false);
   const [loginMode, setLoginMode] = useState<"customer" | "staff">("customer");
+  const [customerAuthView, setCustomerAuthView] = useState<"signin" | "signup">("signin");
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
   const [booking, setBooking] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [tracking, setTracking] = useState("");
@@ -385,12 +387,22 @@ export default function Home() {
         </section>
         <section className="login-panel" aria-labelledby="login-title">
           <div className="login-card">
-            <p className="label">WELCOME BACK</p><h2 id="login-title">Sign in to Forex NZ</h2><p>This demonstration shows how access will be separated in the functional MVP.</p>
-            <div className="login-tabs" role="tablist"><button className={loginMode === "customer" ? "active" : ""} onClick={() => setLoginMode("customer")}>Customer</button><button className={loginMode === "staff" ? "active" : ""} onClick={() => setLoginMode("staff")}>Staff access</button></div>
-            <label>Email address<input type="email" defaultValue={loginMode === "customer" ? "maria@example.com" : "staff@forex.example"} key={loginMode} /></label>
-            <label>Password<input type="password" defaultValue="demoonly" /></label>
-            {loginMode === "staff" && <label>Assigned workspace<select value={role === "customer" ? "agent" : role} onChange={(e) => setRole(e.target.value as Role)}><option value="agent">NZ Agent</option><option value="philippines">PH Operations</option></select></label>}
-            <button className="login-submit" onClick={() => { if (loginMode === "customer") setRole("customer"); else if (role === "customer") setRole("agent"); setAuthenticated(true); }}>Open {loginMode === "customer" ? "customer portal" : "staff workspace"}</button>
+            <p className="label">{customerAuthView === "signup" && loginMode === "customer" ? "NEW CUSTOMER" : "WELCOME BACK"}</p><h2 id="login-title">{customerAuthView === "signup" && loginMode === "customer" ? "Create your Forex NZ account" : "Sign in to Forex NZ"}</h2><p>{customerAuthView === "signup" && loginMode === "customer" ? "Set up your customer profile, pickup address and preferred notifications." : "This demonstration shows how access will be separated in the functional MVP."}</p>
+            <div className="login-tabs" role="tablist"><button className={loginMode === "customer" ? "active" : ""} onClick={() => { setLoginMode("customer"); setAuthNotice(null); }}>Customer</button><button className={loginMode === "staff" ? "active" : ""} onClick={() => { setLoginMode("staff"); setCustomerAuthView("signin"); setAuthNotice(null); }}>Staff access</button></div>
+            {loginMode === "customer" && customerAuthView === "signup" ? <form className="signup-form" onSubmit={(event) => { event.preventDefault(); setRole("customer"); setAuthenticated(true); setCustomerNotification("Welcome to Forex NZ, Maria! Your demo customer account is ready."); }}>
+              <div className="signup-grid"><label>Full name<input required defaultValue="Maria Santos" autoComplete="name" /></label><label>Mobile number<input required type="tel" defaultValue="021 555 0188" autoComplete="tel" /></label><label>Email address<input required type="email" defaultValue="maria@example.com" autoComplete="email" /></label><label>NZ pickup address<input required defaultValue="Mount Roskill, Auckland" autoComplete="street-address" /></label><label>Preferred notifications<select defaultValue="both"><option value="both">Email and SMS</option><option value="email">Email only</option><option value="sms">SMS only</option><option value="app">In-app only</option></select></label><label>Create password<input required type="password" defaultValue="demoonly" autoComplete="new-password" /></label></div>
+              <label className="consent-check"><input required type="checkbox" defaultChecked /> <span>I agree to the privacy notice and shipment updates</span></label>
+              <button className="login-submit" type="submit">Create demo account</button>
+              <button className="auth-switch" type="button" onClick={() => { setCustomerAuthView("signin"); setAuthNotice(null); }}>Already registered? Sign in</button>
+            </form> : <>
+              <label>Email address<input type="email" defaultValue={loginMode === "customer" ? "maria@example.com" : "staff@forex.example"} key={loginMode} /></label>
+              <label>Password<input type="password" defaultValue="demoonly" /></label>
+              {loginMode === "staff" && <label>Assigned workspace<select value={role === "customer" ? "agent" : role} onChange={(e) => setRole(e.target.value as Role)}><option value="agent">NZ Agent</option><option value="philippines">PH Operations</option></select></label>}
+              {loginMode === "customer" && <button className="forgot-password" onClick={() => setAuthNotice("Demo reset link sent to maria@example.com")}>Forgot password?</button>}
+              {authNotice && <p className="auth-notice" role="status">✓ {authNotice}</p>}
+              <button className="login-submit" onClick={() => { if (loginMode === "customer") setRole("customer"); else if (role === "customer") setRole("agent"); setAuthenticated(true); }}>Open {loginMode === "customer" ? "customer portal" : "staff workspace"}</button>
+              {loginMode === "customer" && <button className="auth-switch" onClick={() => { setCustomerAuthView("signup"); setAuthNotice(null); }}>New customer? Create an account</button>}
+            </>}
             <small className="login-disclosure">Demo only. Production authentication and permissions will be enforced by Firebase Authentication and Firestore security rules.</small>
           </div>
         </section>

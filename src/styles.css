@@ -338,6 +338,15 @@ footer{gap:25px;flex-wrap:wrap}
 .login-tabs button.active{background:var(--paper);color:var(--navy);box-shadow:0 3px 12px rgba(8,44,52,.09)}
 .login-card>label{display:block;color:var(--navy);font-size:12px;font-weight:900;margin:15px 0}
 .login-card input,.login-card select{display:block;width:100%;margin-top:8px;border:1px solid #ccd6d1;border-radius:7px;background:white;padding:13px;color:var(--ink)}
+.signup-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px 15px}
+.signup-grid label{display:block;color:var(--navy);font-size:11px;font-weight:900}
+.signup-grid input,.signup-grid select{margin-top:6px;padding:11px}
+.consent-check{display:flex!important;align-items:flex-start;gap:9px;margin:16px 0 0!important;color:var(--muted)!important;font-size:10px!important;line-height:1.4}
+.consent-check input{display:block;width:16px;height:16px;margin:0;padding:0;accent-color:var(--navy);flex:0 0 auto}
+.auth-switch,.forgot-password{display:block;border:0;background:transparent;color:var(--orange-dark);font-size:11px;font-weight:900}
+.auth-switch{width:100%;padding:12px 0 0;text-align:center}
+.forgot-password{margin:-5px 0 0 auto;padding:2px 0}
+.auth-notice{background:var(--mint);color:var(--navy)!important;border-radius:7px;padding:9px 11px;margin:12px 0 0!important;font-size:10px;line-height:1.4!important}
 .login-submit{width:100%;border:0;border-radius:7px;background:var(--orange);color:white;padding:15px;margin-top:16px;font-weight:900}
 .login-disclosure{display:block;color:var(--muted);font-size:10px;line-height:1.5;text-align:center;margin-top:16px}
 
@@ -483,6 +492,7 @@ body{background:linear-gradient(145deg,#dbeaf5,#f2f8fc);min-height:100vh}
 .login-panel{padding:32px 22px 48px}
 .login-card h2{font-size:31px}
 .login-card input,.login-card select,.login-tabs button,.login-submit{min-height:48px;font-size:14px}
+.signup-grid{grid-template-columns:1fr}
 
 @media(max-width:380px){.app-home .connection-pill{display:none}.app-home .quick-grid,.app-home .network-grid{grid-template-columns:1fr}.app-home .hero-copy h1{font-size:28px}}
 }
