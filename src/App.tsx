@@ -127,7 +127,8 @@ function JourneyAnimation() {
   );
 }
 
-function CustomerView({ onBook }: { onBook: () => void }) {
+function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext }: { onBook: () => void; trackingStage: number; trackingActive: boolean; secondsToNext: number }) {
+  const delivered = trackingStage === milestones.length - 1;
   return (
     <>
       <section className="shipment-card" id="shipment-result">
@@ -136,23 +137,24 @@ function CustomerView({ onBook }: { onBook: () => void }) {
             <p className="label">ACTIVE SHIPMENT</p>
             <h2>BB-NZ-04821</h2>
           </div>
-          <span className="status-pill"><i /> In transit</span>
+          <span className={`status-pill ${delivered ? "delivered" : ""}`}><i /> {delivered ? "Delivered" : "In transit"}</span>
         </div>
         <div className="route-line" aria-label="Auckland to Quezon City">
           <div><span>NZ</span><strong>Auckland</strong><small>Sent by Maria</small></div>
-          <div className="ocean"><b>✦</b></div>
+          <div className="ocean"><b style={{ left: trackingStage >= 3 ? "90%" : "52%" }}>✦</b></div>
           <div className="destination"><span>PH</span><strong>Quezon City</strong><small>For Nanay & Tatay</small></div>
         </div>
-        <div className="eta"><span>Estimated arrival</span><strong>12–15 September</strong><em>28 days to go</em></div>
+        <div className="eta"><span>{delivered ? "Delivery confirmed" : "Estimated arrival"}</span><strong>{delivered ? "Delivered to Nanay & Tatay" : trackingStage === 3 ? "Arrived at Manila hub" : "12–15 September"}</strong><em>{delivered ? "Journey complete ✓" : trackingActive ? `Next demo update in ${secondsToNext}s` : "28 days to go"}</em></div>
         <div className="timeline">
-          {milestones.map((item) => (
-            <div className={`milestone ${item.done ? "done" : ""} ${item.current ? "current" : ""}`} key={item.label}>
-              <span className="dot">{item.done && !item.current ? "✓" : item.current ? "●" : ""}</span>
+          {milestones.map((item, index) => (
+            <div className={`milestone ${index <= trackingStage ? "done" : ""} ${index === trackingStage ? "current" : ""}`} key={item.label}>
+              <span className="dot">{index < trackingStage || delivered && index === trackingStage ? "✓" : index === trackingStage ? "●" : ""}</span>
               <strong>{item.label}</strong>
-              <small>{item.detail}</small>
+              <small>{index === 3 && trackingStage >= 3 ? "Received · Manila hub" : index === 4 && delivered ? "Delivered · Quezon City" : item.detail}</small>
             </div>
           ))}
         </div>
+        {trackingActive && <p className="tracking-live" role="status"><i /> Live demonstration running — this shipment advances automatically every 30 seconds.</p>}
         <button className="text-button">View full journey <span>→</span></button>
       </section>
 
@@ -216,6 +218,9 @@ export default function Home() {
   const [confirmed, setConfirmed] = useState(false);
   const [tracking, setTracking] = useState("");
   const [trackingResult, setTrackingResult] = useState<"idle" | "found" | "not-found">("idle");
+  const [trackingStage, setTrackingStage] = useState(2);
+  const [trackingActive, setTrackingActive] = useState(false);
+  const [secondsToNext, setSecondsToNext] = useState(30);
   const [online, setOnline] = useState(true);
   const [queue, setQueue] = useState<OfflineAction[]>([]);
   const [lastSync, setLastSync] = useState<string>("Not synced yet");
@@ -276,6 +281,22 @@ export default function Home() {
     localStorage.setItem("padala-agent-collected-v1", JSON.stringify(agentDone));
   }, [agentDone]);
 
+  useEffect(() => {
+    if (!trackingActive || trackingStage >= milestones.length - 1) return;
+    const timer = window.setInterval(() => {
+      setSecondsToNext((seconds) => {
+        if (seconds > 1) return seconds - 1;
+        setTrackingStage((stage) => {
+          const nextStage = Math.min(stage + 1, milestones.length - 1);
+          if (nextStage === milestones.length - 1) setTrackingActive(false);
+          return nextStage;
+        });
+        return 30;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [trackingActive, trackingStage]);
+
   const toggleCollected = (name: string) => {
     const collected = !agentDone.includes(name);
     setAgentDone((current) => collected ? [...current, name] : current.filter((item) => item !== name));
@@ -287,6 +308,9 @@ export default function Home() {
     setTracking(number);
     if (number === "BB-NZ-04821") {
       setTrackingResult("found");
+      setTrackingStage(2);
+      setSecondsToNext(30);
+      setTrackingActive(true);
       window.setTimeout(() => document.getElementById("shipment-result")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
       return;
     }
@@ -335,7 +359,7 @@ export default function Home() {
           {role === "customer" && <form className="track-box" onSubmit={(event) => { event.preventDefault(); trackShipment(); }}><label htmlFor="tracking">Track any box</label><div><input id="tracking" value={tracking} onChange={(e) => { setTracking(e.target.value); setTrackingResult("idle"); }} placeholder="Enter tracking number"/><button type="submit">Track <span>→</span></button></div><button className="sample-tracking" type="button" onClick={() => { setTracking("BB-NZ-04821"); setTrackingResult("idle"); }}>Use demo number: <strong>BB-NZ-04821</strong></button>{trackingResult === "found" && <p className="tracking-message found" role="status">✓ Shipment found — showing its latest journey below.</p>}{trackingResult === "not-found" && <p className="tracking-message not-found" role="alert">We couldn’t find that number. Try the demo number BB-NZ-04821.</p>}</form>}
         </section>
 
-        {role === "customer" ? <><CustomerView onBook={() => { setBooking(true); setConfirmed(false); }} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} /> : <PhilippinesView />}
+        {role === "customer" ? <><CustomerView onBook={() => { setBooking(true); setConfirmed(false); }} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} /> : <PhilippinesView />}
 
         <section className="offline-feature" aria-labelledby="offline-title">
           <div className="offline-copy">
