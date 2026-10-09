@@ -41,6 +41,14 @@ const milestones = [
   { label: "Delivered", detail: "Quezon City", done: false },
 ];
 
+const customerNotifications = [
+  "Your box has been collected in Auckland.",
+  "Your box has arrived at the Forex NZ warehouse.",
+  "Your box is now at sea and travelling to the Philippines.",
+  "Your box has arrived at the Manila hub.",
+  "Delivered! Nanay & Tatay have received your box.",
+];
+
 const journeySteps = [
   { icon: "📦", short: "NZ Forwarder", title: "Box received at the NZ forwarder", detail: "The label is scanned, the box is checked and the sender receives confirmation.", place: "Auckland, New Zealand" },
   { icon: "🚚", short: "Port transfer", title: "Transferred to the export container", detail: "The box is linked to its container and added to the Philippines manifest.", place: "Auckland freight depot" },
@@ -224,6 +232,7 @@ export default function Home() {
   const [secondsToNext, setSecondsToNext] = useState(30);
   const [trackingStartedAt, setTrackingStartedAt] = useState<number | null>(null);
   const [trackingStartStage, setTrackingStartStage] = useState(0);
+  const [customerNotification, setCustomerNotification] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
   const [queue, setQueue] = useState<OfflineAction[]>([]);
   const [lastSync, setLastSync] = useState<string>("Not synced yet");
@@ -301,6 +310,13 @@ export default function Home() {
     const timer = window.setInterval(updateTracking, 250);
     return () => window.clearInterval(timer);
   }, [trackingActive, trackingStartedAt, trackingStartStage]);
+
+  useEffect(() => {
+    if (trackingStartedAt === null) return;
+    setCustomerNotification(customerNotifications[trackingStage]);
+    const timer = window.setTimeout(() => setCustomerNotification(null), 6000);
+    return () => window.clearTimeout(timer);
+  }, [trackingStage, trackingStartedAt]);
 
   const toggleCollected = (name: string) => {
     const collected = !agentDone.includes(name);
@@ -400,6 +416,8 @@ export default function Home() {
         <button onClick={() => { setBooking(true); setConfirmed(false); }}><span className="tab-action">＋</span><small>Send box</small></button>
         <a href="#help"><span>◌</span><small>Support</small></a>
       </nav>
+
+      {customerNotification && <aside className="customer-notification" role="status" aria-live="polite"><span className="notification-icon">♢</span><div><small>DEMO CUSTOMER NOTIFICATION</small><strong>{customerNotification}</strong><p>In-app alert sent · Email/SMS available in the Firebase version</p></div><button onClick={() => setCustomerNotification(null)} aria-label="Dismiss notification">×</button></aside>}
 
       <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span>Powered by DASHLY · Support · Privacy · Terms</span></footer>
 
