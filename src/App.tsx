@@ -19,17 +19,17 @@ const LAST_SYNC_KEY = "padala-last-sync-v1";
 const roleCopy = {
   customer: {
     eyebrow: "Kia ora, Maria",
-    title: "Your care package is on its way home.",
+    title: "Your care package is on its way home",
     subtitle: "Everything about your box—from your doorstep in Auckland to your family in Quezon City—in one calm, clear place.",
   },
   agent: {
     eyebrow: "Agent workspace · Auckland",
-    title: "Every pickup, sorted and ready.",
+    title: "Every pickup, sorted and ready",
     subtitle: "See today’s requests, organise the run, and keep customers and the Philippines team updated as you work.",
   },
   philippines: {
     eyebrow: "Philippines operations · Manila",
-    title: "Know what’s arriving before it lands.",
+    title: "Know what’s arriving before it lands",
     subtitle: "Shipment manifests, recipient details, and delivery actions are already here—so boxes move without the usual handover delays.",
   },
 };
@@ -106,7 +106,7 @@ function JourneyAnimation() {
       <div className="journey-intro">
         <div>
           <p className="eyebrow">HOW YOUR BOX GETS HOME</p>
-          <h2 id="journey-demo-title">Auckland to Quezon City, step by step.</h2>
+          <h2 id="journey-demo-title">Auckland to Quezon City, step by step</h2>
           <p>Every handover creates a new tracking update. Watch the example journey or select a stage to learn what happens.</p>
         </div>
         <div className="journey-controls">
@@ -194,7 +194,7 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext }: 
       </section>
 
       <section className="rates-guide" aria-labelledby="rates-title">
-        <div className="rates-heading"><div><p className="eyebrow">AUCKLAND SHIPPING RATES</p><h2 id="rates-title">Choose the right box for your padala.</h2><p>Indicative shipping prices from Auckland to the Philippines.</p></div><button onClick={onBook}>Book a box <span>→</span></button></div>
+        <div className="rates-heading"><div><p className="eyebrow">AUCKLAND SHIPPING RATES</p><h2 id="rates-title">Choose the right box for your padala</h2><p>Indicative shipping prices from Auckland to the Philippines.</p></div><button onClick={onBook}>Book a box <span>→</span></button></div>
         <div className="box-size-grid">
           {boxSizes.map((box) => <article key={box.key}><span className={`box-illustration ${box.key}`} aria-hidden="true">▣</span><strong>{box.name}</strong><small>{box.dimensions}</small><b>From NZ${aucklandRates[0].rates[box.key]}</b></article>)}
         </div>
@@ -380,7 +380,7 @@ export default function Home() {
       <main className="login-page">
         <section className="login-story">
           <a className="brand forex-brand light" href="#" aria-label="Forex NZ Freight Forwarder"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></a>
-          <div><p className="eyebrow">DASHLY SECURE ACCESS</p><h1>One platform. The right view for every person.</h1><p>Customers see only their own boxes. Authorised staff enter a separate operational workspace based on their assigned role.</p></div>
+          <div><p className="eyebrow">DASHLY SECURE ACCESS</p><h1>One platform, the right view for every person</h1><p>Customers see only their own boxes. Authorised staff enter a separate operational workspace based on their assigned role.</p></div>
           <small>Prototype access demonstration</small>
         </section>
         <section className="login-panel" aria-labelledby="login-title">
@@ -422,7 +422,7 @@ export default function Home() {
         <section className="offline-feature" aria-labelledby="offline-title">
           <div className="offline-copy">
             <p className="eyebrow">OFFLINE-READY MVP</p>
-            <h2 id="offline-title">Work continues when the internet drops.</h2>
+            <h2 id="offline-title">Work continues when the internet drops</h2>
             <p>Previously loaded bookings, manifests and delivery tasks remain available on the device. Approved updates and QR scans wait securely in a local queue, then sync when a connection returns.</p>
             <div className="offline-rules"><span>✓ Clear online and offline status</span><span>✓ Automatic retry after reconnection</span><span>✓ Time-stamped conflict review</span></div>
           </div>
@@ -436,10 +436,10 @@ export default function Home() {
 
         <section className="promise" id="journey">
           <div className="promise-art"><div className="box-shape"><span>FOREX NZ</span><i /></div><div className="heart">♥</div></div>
-          <div><p className="eyebrow">WALANG KABA</p><h2>No more wondering where it is.</h2><p>Every scan, handover, and journey update is shared across New Zealand and the Philippines—so you and your family always know what’s happening.</p><div className="trust-row"><span>✓ One shared record</span><span>✓ Real-time updates</span><span>✓ Local support at both ends</span></div></div>
+          <div><p className="eyebrow">WALANG KABA</p><h2>No more wondering where it is</h2><p>Every scan, handover, and journey update is shared across New Zealand and the Philippines—so you and your family always know what’s happening.</p><div className="trust-row"><span>✓ One shared record</span><span>✓ Real-time updates</span><span>✓ Local support at both ends</span></div></div>
         </section>
 
-        <section className="network" id="help"><p>BUILT TO GROW WITH OUR COMMUNITY</p><h2>One platform. Every side connected.</h2><div className="network-grid"><div><span>01</span><strong>Customers</strong><small>Book, pay, message, and track from one phone.</small></div><div><span>02</span><strong>NZ agents</strong><small>Organise pickups and customer requests.</small></div><div><span>03</span><strong>PH operations</strong><small>Prepare before each shipment arrives.</small></div><div><span>04</span><strong>Future partners</strong><small>A ready-made system for Filipino entrepreneurs.</small></div></div></section>
+        <section className="network" id="help"><p>BUILT TO GROW WITH OUR COMMUNITY</p><h2>One platform, every side connected</h2><div className="network-grid"><div><span>01</span><strong>Customers</strong><small>Book, pay, message, and track from one phone.</small></div><div><span>02</span><strong>NZ agents</strong><small>Organise pickups and customer requests.</small></div><div><span>03</span><strong>PH operations</strong><small>Prepare before each shipment arrives.</small></div><div><span>04</span><strong>Future partners</strong><small>A ready-made system for Filipino entrepreneurs.</small></div></div></section>
       </div>
 
       <nav className="mobile-tabbar" aria-label="App navigation">
