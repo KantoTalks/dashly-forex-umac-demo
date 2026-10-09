@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 type Role = "customer" | "agent" | "philippines";
 type BoxSize = "xtraLarge" | "large" | "medium" | "small";
@@ -208,6 +208,38 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext }: 
   );
 }
 
+function BookingJourneyModal({ online, onClose, onSave }: { online: boolean; onClose: () => void; onSave: (label: string) => void }) {
+  const [step, setStep] = useState(1);
+  const [complete, setComplete] = useState(false);
+  const [boxSize, setBoxSize] = useState<BoxSize>("large");
+  const [destination, setDestination] = useState("Manila");
+  const [recipient, setRecipient] = useState("Nanay & Tatay");
+  const [recipientMobile, setRecipientMobile] = useState("+63 917 555 0142");
+  const [recipientAddress, setRecipientAddress] = useState("Quezon City, Metro Manila");
+  const [paymentMethod, setPaymentMethod] = useState("Pay after confirmation");
+  const box = boxSizes.find((item) => item.key === boxSize)!;
+  const price = aucklandRates.find((area) => area.zone === destination)?.rates[boxSize] ?? 0;
+
+  const next = (event: FormEvent) => {
+    event.preventDefault();
+    setStep((current) => Math.min(current + 1, 4));
+  };
+
+  const confirmBooking = () => {
+    onSave(`Mount Roskill pickup · ${box.name} · ${destination} · ${recipient} · NZ$${price}`);
+    setComplete(true);
+  };
+
+  return <div className="modal-backdrop" onMouseDown={onClose}><section className="modal booking-journey" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(event) => event.stopPropagation()}><button className="close" onClick={onClose} aria-label="Close">×</button>{complete ? <div className="success"><span>✓</span><p className="eyebrow">{online ? "BOOKING RECEIVED" : "SAVED OFFLINE"}</p><h2>{online ? "Your booking is ready for confirmation" : "Your booking is safe"}</h2><p>{online ? `Forex NZ will confirm the pickup and final NZ$${price} rate. ${recipient} has been saved as the recipient.` : "The booking is stored on this device and will sync automatically when your connection returns."}</p><div className="confirmation-reference"><small>DEMO BOOKING REFERENCE</small><strong>FNZ-2608-1042</strong></div><button onClick={onClose}>Return to customer portal</button></div> : <>
+    <p className="eyebrow">SEND A BOX HOME</p><h2 id="booking-title">Complete your booking</h2>
+    <div className="booking-progress" aria-label={`Booking step ${step} of 4`}>{["Box & pickup", "Recipient", "Declaration", "Review"].map((label, index) => <div className={index + 1 <= step ? "active" : ""} key={label}><i>{index + 1 < step ? "✓" : index + 1}</i><span>{label}</span></div>)}</div>
+    {step === 1 && <form onSubmit={next}><div className="form-grid"><label>Pickup suburb<input required defaultValue="Mount Roskill" /></label><label>Destination zone<select value={destination} onChange={(event) => setDestination(event.target.value)}>{aucklandRates.map((area) => <option key={area.zone}>{area.zone}</option>)}</select></label><label>Box size<select value={boxSize} onChange={(event) => setBoxSize(event.target.value as BoxSize)}>{boxSizes.map((item) => <option value={item.key} key={item.key}>{item.name} · {item.dimensions}</option>)}</select></label><label>Preferred pickup day<input required type="date" defaultValue="2026-08-19" /></label><label>Time window<select><option>9am–12pm</option><option>12pm–3pm</option><option>3pm–6pm</option></select></label><div className="booking-price"><span>Indicative shipping rate</span><strong>NZ${price}</strong><small>Final price confirmed before booking</small></div></div><button className="confirm" type="submit">Continue to recipient <span>→</span></button></form>}
+    {step === 2 && <form onSubmit={next}><div className="form-grid"><label>Recipient name<input required value={recipient} onChange={(event) => setRecipient(event.target.value)} /></label><label>Philippines mobile<input required type="tel" value={recipientMobile} onChange={(event) => setRecipientMobile(event.target.value)} /></label><label className="form-wide">Complete delivery address<textarea required value={recipientAddress} onChange={(event) => setRecipientAddress(event.target.value)} /></label><label>Relationship<select defaultValue="parent"><option value="parent">Parent</option><option value="relative">Relative</option><option value="friend">Friend</option></select></label><label>Delivery instruction<input defaultValue="Please call before delivery" /></label></div><div className="step-actions"><button type="button" onClick={() => setStep(1)}>Back</button><button className="confirm" type="submit">Continue to declaration <span>→</span></button></div></form>}
+    {step === 3 && <form onSubmit={next}><div className="declaration-panel"><h3>Balikbayan box declaration</h3><p>For this demonstration, acknowledge the information that will be required by the Bureau of Customs.</p><label><input required type="checkbox" /> The box contains personal and household effects only</label><label><input required type="checkbox" /> No prohibited, restricted or commercial-quantity items are included</label><label><input required type="checkbox" /> I will complete the official BOC information sheet before collection</label><label>Estimated contents value (PHP)<input required type="number" defaultValue="25000" min="0" max="150000" /></label></div><div className="step-actions"><button type="button" onClick={() => setStep(2)}>Back</button><button className="confirm" type="submit">Review booking <span>→</span></button></div></form>}
+    {step === 4 && <div><div className="booking-summary"><div><span>Box</span><strong>{box.name}</strong><small>{box.dimensions}</small></div><div><span>Destination</span><strong>{destination}</strong><small>{recipient} · {recipientMobile}</small></div><div><span>Indicative rate</span><strong>NZ${price}</strong><small>Subject to final confirmation</small></div></div><label className="payment-choice">Payment preference<select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value)}><option>Pay after confirmation</option><option>Bank transfer after invoice</option><option>Demo card payment</option></select></label><p className="payment-note">No real payment is collected in this prototype. Production invoices and payment status will be secured through the backend.</p><div className="step-actions"><button type="button" onClick={() => setStep(3)}>Back</button><button className="confirm" onClick={confirmBooking}>Confirm demo booking <span>→</span></button></div></div>}
+  </>}</section></div>;
+}
+
 function AgentView({ done, onToggle }: { done: string[]; onToggle: (name: string) => void }) {
   const jobs = [
     ["09:30", "Maria Santos", "Mount Roskill", "2 standard boxes"],
@@ -255,7 +287,6 @@ export default function Home() {
   const [customerAuthView, setCustomerAuthView] = useState<"signin" | "signup">("signin");
   const [authNotice, setAuthNotice] = useState<string | null>(null);
   const [booking, setBooking] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
   const [tracking, setTracking] = useState("");
   const [trackingResult, setTrackingResult] = useState<"idle" | "found" | "not-found">("idle");
   const [trackingStage, setTrackingStage] = useState(0);
@@ -264,8 +295,6 @@ export default function Home() {
   const [trackingStartedAt, setTrackingStartedAt] = useState<number | null>(null);
   const [trackingStartStage, setTrackingStartStage] = useState(0);
   const [customerNotification, setCustomerNotification] = useState<string | null>(null);
-  const [bookingSize, setBookingSize] = useState<BoxSize>("large");
-  const [bookingDestination, setBookingDestination] = useState("Manila");
   const [online, setOnline] = useState(true);
   const [queue, setQueue] = useState<OfflineAction[]>([]);
   const [lastSync, setLastSync] = useState<string>("Not synced yet");
@@ -274,7 +303,6 @@ export default function Home() {
   const copy = roleCopy[role];
 
   const queuedChanges = queue.length;
-  const selectedRate = aucklandRates.find((area) => area.zone === bookingDestination)?.rates[bookingSize] ?? 0;
 
   const saveAction = (type: OfflineAction["type"], label: string) => {
     const action: OfflineAction = {
@@ -429,7 +457,7 @@ export default function Home() {
           {role === "customer" && <form className="track-box" onSubmit={(event) => { event.preventDefault(); trackShipment(); }}><label htmlFor="tracking">Track any box</label><div><input id="tracking" value={tracking} onChange={(e) => { setTracking(e.target.value); setTrackingResult("idle"); }} placeholder="Enter tracking number"/><button type="submit">Track <span>→</span></button></div><button className="sample-tracking" type="button" onClick={() => { setTracking("BB-NZ-04821"); setTrackingResult("idle"); }}>Use demo number: <strong>BB-NZ-04821</strong></button>{trackingResult === "found" && <p className="tracking-message found" role="status">✓ Shipment found — showing its latest journey below.</p>}{trackingResult === "not-found" && <p className="tracking-message not-found" role="alert">We couldn’t find that number. Try the demo number BB-NZ-04821.</p>}</form>}
         </section>
 
-        {role === "customer" ? <><CustomerView onBook={() => { setBooking(true); setConfirmed(false); }} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} /> : <PhilippinesView />}
+        {role === "customer" ? <><CustomerView onBook={() => setBooking(true)} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} /> : <PhilippinesView />}
 
         <section className="offline-feature" aria-labelledby="offline-title">
           <div className="offline-copy">
@@ -457,7 +485,7 @@ export default function Home() {
       <nav className="mobile-tabbar" aria-label="App navigation">
         <a className="active" href="#home"><span>⌂</span><small>Home</small></a>
         <a href="#journey"><span>▣</span><small>Shipments</small></a>
-        <button onClick={() => { setBooking(true); setConfirmed(false); }}><span className="tab-action">＋</span><small>Send box</small></button>
+        <button onClick={() => setBooking(true)}><span className="tab-action">＋</span><small>Send box</small></button>
         <a href="#help"><span>◌</span><small>Support</small></a>
         <button className="mobile-logout" onClick={() => setAuthenticated(false)}><span>↪</span><small>Log out</small></button>
       </nav>
@@ -466,7 +494,7 @@ export default function Home() {
 
       <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span>Powered by DASHLY · Support · Privacy · Terms</span></footer>
 
-      {booking && <div className="modal-backdrop" onMouseDown={() => setBooking(false)}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(e) => e.stopPropagation()}><button className="close" onClick={() => setBooking(false)} aria-label="Close">×</button>{confirmed ? <div className="success"><span>✓</span><p className="eyebrow">{online ? "PICKUP REQUESTED" : "SAVED OFFLINE"}</p><h2>{online ? "We’ve got you, Maria." : "Your request is safe."}</h2><p>{online ? `Andre will confirm your Auckland pickup and indicative NZ$${selectedRate} shipping rate shortly.` : "It is stored on this device and will be sent automatically when your connection returns."}</p><button onClick={() => setBooking(false)}>Back to my shipment</button></div> : <><p className="eyebrow">SEND A BOX HOME</p><h2 id="booking-title">Where should we collect it?</h2><p>Choose your box and destination. Your agent will confirm the final price and pickup time.</p><div className="form-grid"><label>Pickup suburb<input defaultValue="Mount Roskill" /></label><label>Destination zone<select value={bookingDestination} onChange={(event) => setBookingDestination(event.target.value)}>{aucklandRates.map((area) => <option key={area.zone}>{area.zone}</option>)}</select></label><label>Box size<select value={bookingSize} onChange={(event) => setBookingSize(event.target.value as BoxSize)}>{boxSizes.map((box) => <option value={box.key} key={box.key}>{box.name} · {box.dimensions}</option>)}</select></label><label>Preferred day<input type="date" defaultValue="2026-08-19" /></label><label>Time window<select><option>9am–12pm</option><option>12pm–3pm</option><option>3pm–6pm</option></select></label><div className="booking-price"><span>Indicative shipping rate</span><strong>NZ${selectedRate}</strong><small>From Auckland · final price confirmed before booking</small></div></div><button className="confirm" onClick={() => { const box = boxSizes.find((item) => item.key === bookingSize); saveAction("pickup-request", `Mount Roskill pickup · ${box?.name} · ${bookingDestination} · NZ$${selectedRate}`); setConfirmed(true); }}>Request pickup <span>→</span></button><small className="fineprint">{online ? "No charge until your agent confirms the booking." : "No internet needed. This request will sync automatically."}</small></>}</section></div>}
+      {booking && <BookingJourneyModal online={online} onClose={() => setBooking(false)} onSave={(label) => saveAction("pickup-request", label)} />}
     </main>
   );
 }
