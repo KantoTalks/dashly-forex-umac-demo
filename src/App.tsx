@@ -223,6 +223,7 @@ export default function Home() {
   const [trackingActive, setTrackingActive] = useState(false);
   const [secondsToNext, setSecondsToNext] = useState(30);
   const [trackingStartedAt, setTrackingStartedAt] = useState<number | null>(null);
+  const [trackingStartStage, setTrackingStartStage] = useState(0);
   const [online, setOnline] = useState(true);
   const [queue, setQueue] = useState<OfflineAction[]>([]);
   const [lastSync, setLastSync] = useState<string>("Not synced yet");
@@ -287,7 +288,7 @@ export default function Home() {
     if (!trackingActive || trackingStartedAt === null) return;
     const updateTracking = () => {
       const elapsed = Date.now() - trackingStartedAt;
-      const nextStage = Math.min(Math.floor(elapsed / 30000), milestones.length - 1);
+      const nextStage = Math.min(trackingStartStage + Math.floor(elapsed / 30000), milestones.length - 1);
       setTrackingStage(nextStage);
       if (nextStage === milestones.length - 1) {
         setSecondsToNext(0);
@@ -299,7 +300,7 @@ export default function Home() {
     updateTracking();
     const timer = window.setInterval(updateTracking, 250);
     return () => window.clearInterval(timer);
-  }, [trackingActive, trackingStartedAt]);
+  }, [trackingActive, trackingStartedAt, trackingStartStage]);
 
   const toggleCollected = (name: string) => {
     const collected = !agentDone.includes(name);
@@ -312,10 +313,14 @@ export default function Home() {
     setTracking(number);
     if (number === "BB-NZ-04821") {
       setTrackingResult("found");
-      setTrackingStage(0);
+      setTrackingStage((stage) => {
+        const nextStage = stage >= milestones.length - 1 ? 0 : stage + 1;
+        setTrackingStartStage(nextStage);
+        setTrackingActive(nextStage < milestones.length - 1);
+        return nextStage;
+      });
       setSecondsToNext(30);
       setTrackingStartedAt(Date.now());
-      setTrackingActive(true);
       window.setTimeout(() => document.getElementById("shipment-result")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
       return;
     }
