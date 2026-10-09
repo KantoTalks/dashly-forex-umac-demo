@@ -130,7 +130,7 @@ function JourneyAnimation() {
 function CustomerView({ onBook }: { onBook: () => void }) {
   return (
     <>
-      <section className="shipment-card">
+      <section className="shipment-card" id="shipment-result">
         <div className="shipment-top">
           <div>
             <p className="label">ACTIVE SHIPMENT</p>
@@ -215,6 +215,7 @@ export default function Home() {
   const [booking, setBooking] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [tracking, setTracking] = useState("");
+  const [trackingResult, setTrackingResult] = useState<"idle" | "found" | "not-found">("idle");
   const [online, setOnline] = useState(true);
   const [queue, setQueue] = useState<OfflineAction[]>([]);
   const [lastSync, setLastSync] = useState<string>("Not synced yet");
@@ -281,6 +282,17 @@ export default function Home() {
     saveAction("collection-update", `${name}: ${collected ? "collected" : "reopened"}`);
   };
 
+  const trackShipment = () => {
+    const number = tracking.trim().toUpperCase();
+    setTracking(number);
+    if (number === "BB-NZ-04821") {
+      setTrackingResult("found");
+      window.setTimeout(() => document.getElementById("shipment-result")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+      return;
+    }
+    setTrackingResult("not-found");
+  };
+
   if (!authenticated) {
     return (
       <main className="login-page">
@@ -320,7 +332,7 @@ export default function Home() {
       <div className="page-shell" id="home">
         <section className="hero-copy">
           <div><p className="eyebrow">{copy.eyebrow}</p><h1>{copy.title}</h1><p>{copy.subtitle}</p></div>
-          {role === "customer" && <div className="track-box"><label htmlFor="tracking">Track any box</label><div><input id="tracking" value={tracking} onChange={(e) => setTracking(e.target.value)} placeholder="Enter tracking number"/><button onClick={() => setTracking("BB-NZ-04821")}>Track <span>→</span></button></div></div>}
+          {role === "customer" && <form className="track-box" onSubmit={(event) => { event.preventDefault(); trackShipment(); }}><label htmlFor="tracking">Track any box</label><div><input id="tracking" value={tracking} onChange={(e) => { setTracking(e.target.value); setTrackingResult("idle"); }} placeholder="Enter tracking number"/><button type="submit">Track <span>→</span></button></div><button className="sample-tracking" type="button" onClick={() => { setTracking("BB-NZ-04821"); setTrackingResult("idle"); }}>Use demo number: <strong>BB-NZ-04821</strong></button>{trackingResult === "found" && <p className="tracking-message found" role="status">✓ Shipment found — showing its latest journey below.</p>}{trackingResult === "not-found" && <p className="tracking-message not-found" role="alert">We couldn’t find that number. Try the demo number BB-NZ-04821.</p>}</form>}
         </section>
 
         {role === "customer" ? <><CustomerView onBook={() => { setBooking(true); setConfirmed(false); }} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} /> : <PhilippinesView />}

@@ -39,6 +39,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .track-box input{border:0;background:transparent;padding:14px;width:100%;min-width:0}
 .track-box button{border:0;background:var(--navy);color:white;padding:0 17px;font-weight:800}
 .track-box button span{margin-left:9px;color:var(--yellow)}
+.track-box .sample-tracking{display:block;border:0;background:transparent;color:var(--sea);padding:8px 2px 0;font-size:11px;text-align:left}
+.track-box .sample-tracking strong{letter-spacing:.04em;text-decoration:underline;text-underline-offset:2px}
+.tracking-message{margin:8px 2px 0!important;font-size:11px!important;font-weight:800;line-height:1.4!important}
+.tracking-message.found{color:#16755f!important}
+.tracking-message.not-found{color:#a33a3a!important}
 
 .shipment-card,.operations-card{background:var(--paper);border:1px solid #e3ded4;border-radius:12px;box-shadow:0 12px 34px rgba(9,44,52,.07);padding:28px 32px}
 .shipment-top{display:flex;justify-content:space-between;align-items:center}
