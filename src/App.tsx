@@ -5,7 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 type Role = "customer" | "agent" | "philippines";
 type BoxSize = "xtraLarge" | "large" | "medium" | "small";
-type StaffBookingStage = "pending" | "confirmed" | "collected" | "warehouse" | "container" | "departed";
+type StaffBookingStage = "pending" | "confirmed" | "collected" | "warehouse" | "container" | "departed" | "ph_received" | "sorted" | "out_for_delivery" | "delivered";
 
 type OfflineAction = {
   id: string;
@@ -50,10 +50,12 @@ const staffShipmentMilestones = [
   { label: "NZ warehouse", detail: "East Tāmaki" },
   { label: "Container", detail: "NZ-1026-A" },
   { label: "At sea", detail: "Auckland to Manila" },
-  { label: "Delivered", detail: "Quezon City" },
+  { label: "Manila hub", detail: "Received and sorted" },
+  { label: "Out for delivery", detail: "Quezon City route" },
+  { label: "Delivered", detail: "Recipient PIN confirmed" },
 ];
 
-const staffStageToTracking: Record<StaffBookingStage, number> = { pending: 0, confirmed: 0, collected: 1, warehouse: 2, container: 3, departed: 4 };
+const staffStageToTracking: Record<StaffBookingStage, number> = { pending: 0, confirmed: 0, collected: 1, warehouse: 2, container: 3, departed: 4, ph_received: 5, sorted: 5, out_for_delivery: 6, delivered: 7 };
 
 const customerNotifications = [
   "Your box has been collected in Auckland.",
@@ -170,7 +172,7 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext, tr
   const visibleMilestones = isStaffShipment ? staffShipmentMilestones : milestones;
   const visibleStage = isStaffShipment ? staffStageToTracking[staffBookingStage] : trackingStage;
   const delivered = visibleStage === visibleMilestones.length - 1;
-  const markerPositions = isStaffShipment ? [2, 18, 38, 58, 82, 98] : [2, 24, 52, 88, 98];
+  const markerPositions = isStaffShipment ? [2, 14, 28, 43, 60, 76, 90, 98] : [2, 24, 52, 88, 98];
   const currentStatus = visibleMilestones[visibleStage];
   return (
     <>
@@ -188,7 +190,7 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext, tr
           <div className="destination"><span>PH</span><strong>Quezon City</strong><small>For Nanay & Tatay</small></div>
         </div>
         <div className="eta"><span>{delivered ? "Delivery confirmed" : isStaffShipment ? "Live QR status" : trackingActive ? "Live shipment update" : "Current demo stage"}</span><strong>{delivered ? "Delivered to Nanay & Tatay" : currentStatus.label}</strong><em>{delivered ? "Journey complete ✓" : isStaffShipment ? "Updated by authorised staff scans" : trackingActive ? `Next demo update in ${secondsToNext}s` : "Enter the demo number to begin"}</em></div>
-        <div className={`timeline ${isStaffShipment ? "six-stages" : ""}`}>
+        <div className={`timeline ${isStaffShipment ? "staff-stages" : ""}`}>
           {visibleMilestones.map((item, index) => (
             <div className={`milestone ${index <= visibleStage ? "done" : ""} ${index === visibleStage ? "current" : ""}`} key={item.label}>
               <span className="dot">{index < visibleStage || delivered && index === visibleStage ? "✓" : index === visibleStage ? "●" : ""}</span>
@@ -271,7 +273,7 @@ function AgentView({ done, onToggle, bookingStage, onConfirmBooking, onAdvanceBo
     { key: "departed", label: "At sea" },
   ];
   const workflowIndex = workflowStages.findIndex((stage) => stage.key === bookingStage);
-  const stageStatus: Record<StaffBookingStage, string> = { pending: "Awaiting review", confirmed: "QR ready", collected: "Collected", warehouse: "At warehouse", container: "Manifest ready", departed: "Departed NZ" };
+  const stageStatus: Record<StaffBookingStage, string> = { pending: "Awaiting review", confirmed: "QR ready", collected: "Collected", warehouse: "At warehouse", container: "Manifest ready", departed: "Departed NZ", ph_received: "Received in Manila", sorted: "Sorted", out_for_delivery: "Out for delivery", delivered: "Delivered" };
   const actionCopy: Record<Exclude<StaffBookingStage, "pending" | "departed">, { title: string; button: string }> = {
     confirmed: { title: "Label ready for collection", button: "Scan and mark collected" },
     collected: { title: "Collected and heading to warehouse", button: "Scan warehouse arrival" },
@@ -326,9 +328,19 @@ function AgentView({ done, onToggle, bookingStage, onConfirmBooking, onAdvanceBo
   );
 }
 
-function PhilippinesView({ bookingStage }: { bookingStage: StaffBookingStage }) {
-  const nzHandover = bookingStage === "departed" ? "Inbound" : bookingStage === "container" ? "Manifest ready" : "Pending NZ";
+function PhilippinesView({ bookingStage, onAdvance }: { bookingStage: StaffBookingStage; onAdvance: () => void }) {
+  const [pin, setPin] = useState("");
+  const phStages: StaffBookingStage[] = ["departed", "ph_received", "sorted", "out_for_delivery", "delivered"];
+  const phIndex = phStages.indexOf(bookingStage);
+  const nzHandover = bookingStage === "delivered" ? "Delivered" : bookingStage === "out_for_delivery" ? "Delivering" : bookingStage === "sorted" ? "Sorted" : bookingStage === "ph_received" ? "Received" : bookingStage === "departed" ? "Inbound" : bookingStage === "container" ? "Manifest ready" : "Pending NZ";
+  const phActions: Partial<Record<StaffBookingStage, { title: string; detail: string; button: string }>> = {
+    departed: { title: "Container arriving from Auckland", detail: "Scan the container seal and confirm its arrival at the Manila hub.", button: "Scan container arrival" },
+    ph_received: { title: "Container received at Manila hub", detail: "Scan the individual box and reconcile it against manifest NZ-1026.", button: "Confirm box and sort" },
+    sorted: { title: "Box sorted for Quezon City", detail: "Assign the shipment to an authorised last-mile delivery driver.", button: "Assign to driver Carlo" },
+    out_for_delivery: { title: "Out for delivery with Carlo", detail: "Confirm the recipient’s four-digit PIN to complete proof of delivery.", button: "Confirm delivery" },
+  };
   return (
+    <>
     <section className="operations-card">
       <div className="ops-summary ph-summary"><div><span>186</span><small>Boxes inbound</small></div><div><span>12 Sep</span><small>Next arrival</small></div><div><span>92%</span><small>Details complete</small></div></div>
       <div className="section-heading"><div><p className="label">INBOUND MANIFEST</p><h2>ANL Warrnambool · NZ-0826</h2></div><span className="status-pill"><i /> Live manifest</span></div>
@@ -343,6 +355,14 @@ function PhilippinesView({ bookingStage }: { bookingStage: StaffBookingStage }) 
       </div>
       <button className="text-button">Open complete manifest <span>→</span></button>
     </section>
+    <section className="ph-shipment-card" aria-labelledby="ph-shipment-title">
+      <div className="ph-shipment-head"><div><p className="label">PHILIPPINES HANDOVER</p><h2 id="ph-shipment-title">BB-NZ-26081042</h2><p>Nanay & Tatay · Quezon City</p></div><span className={`staff-status ${bookingStage}`}>{nzHandover}</span></div>
+      {phIndex < 0 ? <div className="ph-waiting"><span>⌛</span><div><strong>Waiting for New Zealand departure</strong><p>The shipment will become actionable here after Forex NZ confirms the manifest departure.</p></div></div> : <>
+        <div className="ph-flow">{["Inbound", "Hub received", "Sorted", "Out for delivery", "Delivered"].map((label, index) => <div className={index <= phIndex ? "complete" : ""} key={label}><i>{index < phIndex ? "✓" : index + 1}</i><span>{label}</span></div>)}</div>
+        {bookingStage === "delivered" ? <div className="delivery-proof"><span>✓</span><div><p className="label">PROOF OF DELIVERY COMPLETE</p><h3>Delivered to Nanay & Tatay</h3><p>Recipient PIN confirmed · Quezon City · Driver Carlo · Customer notified</p></div></div> : <div className="ph-action-panel"><div><p className="label">NEXT AUTHORISED ACTION</p><h3>{phActions[bookingStage]?.title}</h3><p>{phActions[bookingStage]?.detail}</p></div>{bookingStage === "out_for_delivery" && <label>Recipient PIN<input inputMode="numeric" maxLength={4} placeholder="Enter 4-digit PIN" value={pin} onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))} /></label>}<button disabled={bookingStage === "out_for_delivery" && pin.length !== 4} onClick={onAdvance}>{phActions[bookingStage]?.button} <span>→</span></button></div>}
+      </>}
+    </section>
+    </>
   );
 }
 
@@ -368,6 +388,7 @@ export default function Home() {
   const [staffBookingStage, setStaffBookingStage] = useState<StaffBookingStage>("pending");
   const [syncing, setSyncing] = useState(false);
   const copy = roleCopy[role];
+  const agentVisibleStage: StaffBookingStage = ["ph_received", "sorted", "out_for_delivery", "delivered"].includes(staffBookingStage) ? "departed" : staffBookingStage;
 
   const queuedChanges = queue.length;
 
@@ -464,9 +485,9 @@ export default function Home() {
   };
 
   const advanceStaffBooking = () => {
-    const nextStage: Record<Exclude<StaffBookingStage, "pending" | "departed">, StaffBookingStage> = { confirmed: "collected", collected: "warehouse", warehouse: "container", container: "departed" };
-    if (staffBookingStage === "pending" || staffBookingStage === "departed") return;
-    const next = nextStage[staffBookingStage];
+    const nextStage = { confirmed: "collected", collected: "warehouse", warehouse: "container", container: "departed" } as const;
+    if (!(staffBookingStage in nextStage)) return;
+    const next = nextStage[staffBookingStage as keyof typeof nextStage];
     const events: Record<StaffBookingStage, string> = {
       pending: "",
       confirmed: "",
@@ -474,6 +495,10 @@ export default function Home() {
       warehouse: "BB-NZ-26081042 received at the East Tāmaki warehouse",
       container: "BB-NZ-26081042 assigned to container NZ-1026-A",
       departed: "Manifest NZ-1026 departed Port of Auckland",
+      ph_received: "",
+      sorted: "",
+      out_for_delivery: "",
+      delivered: "",
     };
     const notices: Record<StaffBookingStage, string> = {
       pending: "",
@@ -482,6 +507,31 @@ export default function Home() {
       warehouse: "Your box BB-NZ-26081042 has arrived at the Forex NZ warehouse.",
       container: "Your box BB-NZ-26081042 is assigned to its export container.",
       departed: "Your box BB-NZ-26081042 has departed New Zealand and is heading to Manila.",
+      ph_received: "",
+      sorted: "",
+      out_for_delivery: "",
+      delivered: "",
+    };
+    setStaffBookingStage(next);
+    saveAction("qr-scan", events[next]);
+    setCustomerNotification(notices[next]);
+  };
+
+  const advancePhilippinesBooking = () => {
+    const nextStage = { departed: "ph_received", ph_received: "sorted", sorted: "out_for_delivery", out_for_delivery: "delivered" } as const;
+    if (!(staffBookingStage in nextStage)) return;
+    const next = nextStage[staffBookingStage as keyof typeof nextStage];
+    const events: Record<typeof next, string> = {
+      ph_received: "Container NZ-1026-A received at Manila hub",
+      sorted: "BB-NZ-26081042 scanned and sorted for Quezon City",
+      out_for_delivery: "BB-NZ-26081042 assigned to driver Carlo",
+      delivered: "BB-NZ-26081042 delivered · recipient PIN confirmed",
+    };
+    const notices: Record<typeof next, string> = {
+      ph_received: "Your box BB-NZ-26081042 has arrived at the Manila hub.",
+      sorted: "Your box BB-NZ-26081042 has been sorted for Quezon City delivery.",
+      out_for_delivery: "Your box BB-NZ-26081042 is out for delivery with Carlo.",
+      delivered: "Delivered! Nanay & Tatay received box BB-NZ-26081042.",
     };
     setStaffBookingStage(next);
     saveAction("qr-scan", events[next]);
@@ -567,7 +617,7 @@ export default function Home() {
           {role === "customer" && <form className="track-box" onSubmit={(event) => { event.preventDefault(); trackShipment(); }}><label htmlFor="tracking">Track any box</label><div><input id="tracking" value={tracking} onChange={(e) => { setTracking(e.target.value); setTrackingResult("idle"); }} placeholder="Enter tracking number"/><button type="submit">Track <span>→</span></button></div><button className="sample-tracking" type="button" onClick={() => { setTracking("BB-NZ-26081042"); setTrackingResult("idle"); }}>Use QR workflow number: <strong>BB-NZ-26081042</strong></button><button className="sample-tracking secondary-sample" type="button" onClick={() => { setTracking("BB-NZ-04821"); setTrackingResult("idle"); }}>Use automatic demo: <strong>BB-NZ-04821</strong></button>{trackingResult === "found" && <p className="tracking-message found" role="status">✓ Shipment found — showing its latest journey below.</p>}{trackingResult === "not-found" && <p className="tracking-message not-found" role="alert">We couldn’t find that number. Try BB-NZ-26081042 or BB-NZ-04821.</p>}</form>}
         </section>
 
-        {role === "customer" ? <><CustomerView onBook={() => setBooking(true)} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} trackingNumber={tracking} trackingResult={trackingResult} staffBookingStage={staffBookingStage} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} bookingStage={staffBookingStage} onConfirmBooking={confirmStaffBooking} onAdvanceBooking={advanceStaffBooking} onResetBooking={() => setStaffBookingStage("pending")} /> : <PhilippinesView bookingStage={staffBookingStage} />}
+        {role === "customer" ? <><CustomerView onBook={() => setBooking(true)} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} trackingNumber={tracking} trackingResult={trackingResult} staffBookingStage={staffBookingStage} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} bookingStage={agentVisibleStage} onConfirmBooking={confirmStaffBooking} onAdvanceBooking={advanceStaffBooking} onResetBooking={() => setStaffBookingStage("pending")} /> : <PhilippinesView bookingStage={staffBookingStage} onAdvance={advancePhilippinesBooking} />}
 
         <section className="offline-feature" aria-labelledby="offline-title">
           <div className="offline-copy">
