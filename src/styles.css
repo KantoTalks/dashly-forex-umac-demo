@@ -465,11 +465,12 @@ body{background:linear-gradient(145deg,#dbeaf5,#f2f8fc);min-height:100vh}
 .app-home .job button{grid-column:3;width:max-content;margin-top:8px;min-height:40px}
 .app-home .manifest-table{overflow-x:auto}
 .app-home .manifest-row{grid-template-columns:120px 145px 120px 92px;min-width:477px}
-.mobile-tabbar{position:fixed;z-index:45;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,520px);height:78px;padding:8px 12px max(8px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-top:1px solid #d5e5f2;box-shadow:0 -8px 30px rgba(11,47,99,.09)}
+.mobile-tabbar{position:fixed;z-index:45;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,520px);height:78px;padding:8px 8px max(8px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-top:1px solid #d5e5f2;box-shadow:0 -8px 30px rgba(11,47,99,.09)}
 .mobile-tabbar a,.mobile-tabbar button{border:0;background:transparent;color:#7890a9;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:800}
 .mobile-tabbar span{font-size:22px;line-height:1}
 .mobile-tabbar small{font-size:10px}
 .mobile-tabbar .active{color:var(--sea)}
+.mobile-tabbar .mobile-logout{color:var(--navy)}
 .mobile-tabbar .tab-action{width:42px;height:42px;margin-top:-25px;border-radius:15px;background:linear-gradient(145deg,var(--orange),var(--sea));color:white;display:grid;place-items:center;box-shadow:0 8px 18px rgba(23,105,170,.3)}
 .app-home .customer-notification{right:50%;transform:translateX(50%);bottom:92px;width:min(488px,calc(100vw - 24px));animation:mobile-notification-in .35s ease-out}
 @keyframes mobile-notification-in{from{opacity:0;transform:translate(50%,18px)}to{opacity:1;transform:translate(50%,0)}}

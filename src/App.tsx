@@ -447,6 +447,7 @@ export default function Home() {
         <a href="#journey"><span>▣</span><small>Shipments</small></a>
         <button onClick={() => { setBooking(true); setConfirmed(false); }}><span className="tab-action">＋</span><small>Send box</small></button>
         <a href="#help"><span>◌</span><small>Support</small></a>
+        <button className="mobile-logout" onClick={() => setAuthenticated(false)}><span>↪</span><small>Log out</small></button>
       </nav>
 
       {customerNotification && <aside className="customer-notification" role="status" aria-live="polite"><span className="notification-icon">♢</span><div><small>DEMO CUSTOMER NOTIFICATION</small><strong>{customerNotification}</strong><p>In-app alert sent · Email/SMS available in the Firebase version</p></div><button onClick={() => setCustomerNotification(null)} aria-label="Dismiss notification">×</button></aside>}
