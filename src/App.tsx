@@ -82,12 +82,16 @@ const aucklandRates: { zone: string; examples: string; rates: Record<BoxSize, nu
 ];
 
 const journeySteps = [
-  { icon: "📦", short: "NZ Forwarder", title: "Box received at the NZ forwarder", detail: "The label is scanned, the box is checked and the sender receives confirmation.", place: "Auckland, New Zealand" },
-  { icon: "🚚", short: "Port transfer", title: "Transferred to the export container", detail: "The box is linked to its container and added to the Philippines manifest.", place: "Auckland freight depot" },
-  { icon: "⚓", short: "NZ departure", title: "Cleared and loaded for departure", detail: "One container update moves every box inside it to the next tracking stage.", place: "Port of Auckland" },
-  { icon: "🚢", short: "At sea", title: "Travelling to the Philippines", detail: "The customer can follow the expected arrival window while the PH team prepares.", place: "Pacific journey" },
-  { icon: "🏢", short: "PH hub", title: "Received by Philippines operations", detail: "The container and individual boxes are scanned, sorted and assigned for delivery.", place: "Manila distribution hub" },
-  { icon: "🏠", short: "Family home", title: "Delivered to the customer’s family", detail: "The recipient confirms with a PIN or signature and proof is sent to the sender.", place: "Quezon City" },
+  { icon: "📝", short: "Book", title: "Customer books a box", detail: "The customer selects a box size, destination, pickup details, recipient and notification preferences.", place: "Customer portal" },
+  { icon: "✓", short: "Confirm", title: "NZ staff reviews and confirms", detail: "Staff checks the booking, confirms the pickup and final rate, and prepares the shipment record.", place: "NZ staff dashboard" },
+  { icon: "▦", short: "QR label", title: "A secure QR label is generated", detail: "The label contains a shipment identifier while customer information remains protected inside DASHLY.", place: "DASHLY automation" },
+  { icon: "📦", short: "Collect", title: "The box is collected", detail: "Staff scans the QR at pickup and the customer immediately sees the collection update.", place: "Auckland, New Zealand" },
+  { icon: "🚢", short: "Ship", title: "Warehouse and sea journey", detail: "Scans move the box through the NZ warehouse, container loading and vessel departure stages.", place: "Auckland to Manila" },
+  { icon: "🏢", short: "Receive", title: "Container arrives in Manila", detail: "The PH team scans the inbound container and DASHLY matches every box in the manifest.", place: "Manila distribution hub" },
+  { icon: "▤", short: "Sort", title: "The box is confirmed and sorted", detail: "Staff scans the box and places it in the correct Quezon City delivery route.", place: "Philippines operations" },
+  { icon: "🚚", short: "Assign", title: "The delivery is assigned", detail: "The shipment is assigned to driver Carlo and the customer receives an out-for-delivery update.", place: "Delivery coordinator" },
+  { icon: "••••", short: "Verify", title: "Recipient confirms a secure PIN", detail: "At handover, the recipient provides the four-digit PIN as part of the delivery proof.", place: "Driver and recipient" },
+  { icon: "🏠", short: "Delivered", title: "Delivery is complete", detail: "The customer sees the final delivered status, recipient confirmation and proof-of-delivery event.", place: "Quezon City" },
 ];
 
 function JourneyAnimation() {
@@ -164,6 +168,25 @@ function JourneyAnimation() {
 
       <p className="journey-note"><span>●</span> In the real system, each step is activated by an authorised QR scan or confirmed shipping event.</p>
     </section>
+  );
+}
+
+function DemoJourneyPage({ onClose }: { onClose: () => void }) {
+  return (
+    <main className="demo-page">
+      <header className="demo-header">
+        <a className="brand forex-brand" href="#" onClick={(event) => { event.preventDefault(); onClose(); }} aria-label="Return to Forex NZ"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></a>
+        <div><span>DASHLY INTERACTIVE DEMO</span><button onClick={onClose}>Return to portal</button></div>
+      </header>
+      <section className="demo-hero">
+        <p className="eyebrow">CUSTOMER TO DOORSTEP</p>
+        <h1>See how one box moves through the complete DASHLY workflow</h1>
+        <p>Select any stage or play the simulation from booking through secure delivery in the Philippines.</p>
+      </section>
+      <div className="demo-shell"><JourneyAnimation /></div>
+      <section className="demo-disclosure"><strong>Interactive prototype</strong><span>This demonstration uses sample data. Firebase will provide real shared records, authentication, notifications and offline synchronisation in production.</span></section>
+      <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span><a href="mailto:despatch@forexumac.co.nz">despatch@forexumac.co.nz</a> · <a href="tel:+6495771383">(09) 577 1383</a></span><span><a href="#" onClick={(event) => { event.preventDefault(); onClose(); }}>Portal</a> · <strong>Demo</strong> · Privacy · Terms</span></footer>
+    </main>
   );
 }
 
@@ -367,6 +390,7 @@ function PhilippinesView({ bookingStage, onAdvance }: { bookingStage: StaffBooki
 }
 
 export default function Home() {
+  const [showDemo, setShowDemo] = useState(() => window.location.hash === "#demo");
   const [role, setRole] = useState<Role>("customer");
   const [authenticated, setAuthenticated] = useState(false);
   const [loginMode, setLoginMode] = useState<"customer" | "staff">("customer");
@@ -389,6 +413,12 @@ export default function Home() {
   const [syncing, setSyncing] = useState(false);
   const copy = roleCopy[role];
   const agentVisibleStage: StaffBookingStage = ["ph_received", "sorted", "out_for_delivery", "delivered"].includes(staffBookingStage) ? "departed" : staffBookingStage;
+
+  useEffect(() => {
+    const updateDemoRoute = () => setShowDemo(window.location.hash === "#demo");
+    window.addEventListener("hashchange", updateDemoRoute);
+    return () => window.removeEventListener("hashchange", updateDemoRoute);
+  }, []);
 
   const queuedChanges = queue.length;
 
@@ -565,6 +595,10 @@ export default function Home() {
     setTrackingResult("not-found");
   };
 
+  if (showDemo) {
+    return <DemoJourneyPage onClose={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setShowDemo(false); }} />;
+  }
+
   if (!authenticated) {
     return (
       <main className="login-page">
@@ -652,7 +686,7 @@ export default function Home() {
 
       {customerNotification && <aside className="customer-notification" role="status" aria-live="polite"><span className="notification-icon">♢</span><div><small>DEMO CUSTOMER NOTIFICATION</small><strong>{customerNotification}</strong><p>In-app alert sent · Email/SMS available in the Firebase version</p></div><button onClick={() => setCustomerNotification(null)} aria-label="Dismiss notification">×</button></aside>}
 
-      <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span><a href="mailto:despatch@forexumac.co.nz">despatch@forexumac.co.nz</a> · <a href="tel:+6495771383">(09) 577 1383</a></span><span>Powered by DASHLY · Privacy · Terms</span></footer>
+      <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span><a href="mailto:despatch@forexumac.co.nz">despatch@forexumac.co.nz</a> · <a href="tel:+6495771383">(09) 577 1383</a></span><span>Powered by DASHLY · <a href="#demo">Demo</a> · Privacy · Terms</span></footer>
 
       {role === "agent" && staffBookingStage !== "pending" && <section className="barcode-print-label" aria-hidden="true">
         <img src="./forex-umac-logo.jpg" alt="" />

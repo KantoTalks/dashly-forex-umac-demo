@@ -177,8 +177,8 @@ footer .forex-brand img{width:180px;height:58px;border-radius:6px}
 .journey-line i{display:block;height:100%;background:var(--orange);transition:width .75s cubic-bezier(.25,.8,.25,1)}
 .moving-box{position:absolute;z-index:3;top:52px;margin-left:calc(8% - 15px);width:31px;height:31px;background:var(--paper);border:2px solid var(--orange);border-radius:50%;display:grid;place-items:center;box-shadow:0 6px 13px rgba(8,44,52,.18);transition:left .75s cubic-bezier(.25,.8,.25,1)}
 .moving-box span{font-size:15px}
-.journey-points{display:grid;grid-template-columns:repeat(6,1fr);position:relative;z-index:2}
-.journey-points button{border:0;background:transparent;padding:0 6px;color:#839593;display:flex;flex-direction:column;align-items:center}
+.journey-points{display:grid;grid-template-columns:repeat(10,1fr);position:relative;z-index:2}
+.journey-points button{border:0;background:transparent;padding:0 3px;color:#839593;display:flex;flex-direction:column;align-items:center}
 .journey-icon{width:56px;height:56px;border:2px solid #cbd8d4;border-radius:50%;background:var(--paper);display:grid;place-items:center;font-size:23px;margin-bottom:14px;filter:grayscale(1);transition:.35s}
 .journey-points strong{font-size:10px;color:var(--muted);transition:.35s}
 .journey-points small{font-size:8px;margin-top:5px;color:#98a8a5}
@@ -199,6 +199,12 @@ footer .forex-brand img{width:180px;height:58px;border-radius:6px}
 .journey-note span{color:var(--orange);margin-right:6px}
 @media(prefers-reduced-motion:reduce){.journey-line i,.moving-box,.journey-icon{transition:none}
 }
+
+.demo-page{min-height:100vh;background:linear-gradient(180deg,#f7fbfe 0,#edf6fb 55%,#f7fbfe 100%)}
+.demo-header{height:82px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(32px,calc((100vw - 1240px)/2));position:sticky;top:0;z-index:20}
+.demo-header>div{display:flex;align-items:center;gap:18px}.demo-header>div span{font-size:10px;letter-spacing:.16em;font-weight:900;color:var(--orange-dark)}.demo-header button{border:0;border-radius:8px;background:var(--navy);color:white;padding:11px 15px;font-weight:900}
+.demo-hero{max-width:900px;margin:0 auto;text-align:center;padding:68px 24px 38px}.demo-hero h1{font-family:Georgia,serif;color:var(--navy);font-size:48px;line-height:1.06;margin:0 0 16px}.demo-hero>p:last-child{color:var(--muted);font-size:16px;line-height:1.6;margin:0 auto;max-width:720px}
+.demo-shell{max-width:1240px;margin:auto;padding:0 32px}.demo-shell .journey-demo{margin-bottom:24px}.demo-disclosure{max-width:1176px;margin:0 auto 70px;padding:17px 20px;border-radius:10px;background:var(--mint);display:flex;align-items:center;gap:14px;color:var(--muted);font-size:11px}.demo-disclosure strong{color:var(--navy);white-space:nowrap}
 
 .promise{display:grid;grid-template-columns:.9fr 1.3fr;background:var(--navy);color:white;border-radius:12px;overflow:hidden;margin-bottom:70px}
 .promise>div:last-child{padding:54px 60px}
@@ -298,6 +304,7 @@ footer{gap:25px;flex-wrap:wrap}
 }
 
 @media(max-width:520px){.shipment-card,.operations-card{padding:22px 18px}
+.demo-header{height:70px;padding:0 16px}.demo-header .forex-brand{min-width:0}.demo-header .forex-brand img{width:145px;height:48px}.demo-header>div span{display:none}.demo-header button{padding:9px 11px;font-size:11px}.demo-hero{padding:42px 20px 25px}.demo-hero h1{font-size:34px}.demo-shell{padding:0 12px}.demo-disclosure{margin:0 12px 32px;align-items:flex-start;flex-direction:column;gap:5px}
 .staff-booking-card{padding:22px 18px}.staff-booking-head{display:block}.staff-status{display:inline-block;margin-top:12px}.staff-booking-grid,.staff-review-panel{grid-template-columns:1fr}.staff-review-panel .review-check,.staff-review-panel button{grid-column:1}.qr-actions>button{display:block;width:100%;margin:8px 0}
 .staff-flow{overflow-x:auto;grid-template-columns:repeat(5,92px);padding-bottom:8px}.staff-flow>div{align-items:flex-start;flex-direction:column}.staff-flow>div:after{left:24px;right:-24px}
 .ph-shipment-card{padding:22px 18px;margin:0 0 18px}.ph-shipment-head{display:block}.ph-flow{overflow-x:auto;grid-template-columns:repeat(5,96px);padding-bottom:8px}.ph-flow>div{align-items:flex-start;flex-direction:column}.ph-flow>div:after{left:24px;right:-24px}.ph-action-panel{grid-template-columns:1fr}.ph-action-panel button{width:100%}
