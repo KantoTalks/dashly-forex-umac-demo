@@ -543,6 +543,16 @@ export default function Home() {
 
       <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span><a href="mailto:despatch@forexumac.co.nz">despatch@forexumac.co.nz</a> · <a href="tel:+6495771383">(09) 577 1383</a></span><span>Powered by DASHLY · Privacy · Terms</span></footer>
 
+      {role === "agent" && staffBookingStage !== "pending" && <section className="barcode-print-label" aria-hidden="true">
+        <img src="./forex-umac-logo.jpg" alt="" />
+        <p>SECURE SHIPMENT LABEL</p>
+        <QRCodeSVG value="urn:dashly:shipment:BB-NZ-26081042" size={250} level="H" marginSize={2} bgColor="#ffffff" fgColor="#182c72" />
+        <h1>BB-NZ-26081042</h1>
+        <div className="print-route"><span>FROM<strong>Auckland, NZ</strong></span><b>→</b><span>TO<strong>Quezon City, PH</strong></span></div>
+        <div className="print-meta"><span>BOOKING<strong>FNZ-2608-1042</strong></span><span>BOX<strong>Large</strong></span></div>
+        <small>Scan only through the authorised DASHLY staff portal</small>
+      </section>}
+
       {booking && <BookingJourneyModal online={online} onClose={() => setBooking(false)} onSave={(label) => saveAction("pickup-request", label)} />}
     </main>
   );

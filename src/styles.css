@@ -521,5 +521,20 @@ body{background:linear-gradient(145deg,#dbeaf5,#f2f8fc);min-height:100vh}
 
 @media(max-width:380px){.app-home .connection-pill{display:none}.app-home .quick-grid,.app-home .network-grid{grid-template-columns:1fr}.app-home .hero-copy h1{font-size:28px}}
 
-@media print{body *{visibility:hidden!important}.qr-label,.qr-label *{visibility:visible!important}.qr-label{position:fixed;inset:20px auto auto 20px;width:250px;border:1px solid #999;box-shadow:none}}
+}
+
+.barcode-print-label{display:none}
+@page{size:100mm 150mm;margin:0}
+@media print{
+html,body{width:100mm!important;height:150mm!important;margin:0!important;padding:0!important;background:white!important;overflow:hidden!important}
+.app-home{width:100mm!important;height:150mm!important;min-height:0!important;margin:0!important;padding:0!important;background:white!important;box-shadow:none!important;overflow:hidden!important}
+.app-home>:not(.barcode-print-label){display:none!important}
+.barcode-print-label{display:flex!important;width:100mm;height:150mm;padding:7mm;flex-direction:column;align-items:center;justify-content:flex-start;background:white;color:#182c72;text-align:center;font-family:Arial,Helvetica,sans-serif}
+.barcode-print-label>img{display:block;width:62mm;height:18mm;object-fit:cover;margin:0 auto 2mm}
+.barcode-print-label>p{margin:0 0 2mm;font-size:8pt;font-weight:900;letter-spacing:.14em;color:#168bb9}
+.barcode-print-label>svg{display:block;width:64mm!important;height:64mm!important;margin:0 auto}
+.barcode-print-label h1{font-family:Arial,Helvetica,sans-serif;font-size:19pt;line-height:1;margin:3mm 0 4mm;letter-spacing:.025em;white-space:nowrap}
+.print-route{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:3mm;border-top:1.5pt solid #182c72;border-bottom:1.5pt solid #182c72;padding:3mm 0}.print-route span,.print-meta span{font-size:7pt;letter-spacing:.08em;color:#60759a}.print-route strong,.print-meta strong{display:block;margin-top:1mm;color:#182c72;font-size:10pt;letter-spacing:0}.print-route b{font-size:18pt;color:#3cafd8}
+.print-meta{width:100%;display:grid;grid-template-columns:2fr 1fr;gap:3mm;padding:3mm 0}.print-meta span{border-right:1pt solid #d3e4ef}.print-meta span:last-child{border:0}
+.barcode-print-label>small{margin-top:auto;font-size:6.5pt;color:#60759a}
 }
