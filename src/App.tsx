@@ -188,9 +188,9 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext }: 
         <button className="quick-card primary" onClick={onBook}>
           <span className="quick-icon">＋</span><div><strong>Send another box</strong><small>Book a pickup in minutes</small></div><b>→</b>
         </button>
-        <button className="quick-card">
-          <span className="quick-icon">⌁</span><div><strong>Message your agent</strong><small>Andre usually replies quickly</small></div><i className="online" />
-        </button>
+        <a className="quick-card" href="mailto:despatch@forexumac.co.nz">
+          <span className="quick-icon">⌁</span><div><strong>Contact Forex NZ</strong><small>despatch@forexumac.co.nz · (09) 577 1383</small></div><i className="online" />
+        </a>
       </section>
 
       <section className="rates-guide" aria-labelledby="rates-title">
@@ -230,7 +230,7 @@ function BookingJourneyModal({ online, onClose, onSave }: { online: boolean; onC
     setComplete(true);
   };
 
-  return <div className="modal-backdrop" onMouseDown={onClose}><section className="modal booking-journey" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(event) => event.stopPropagation()}><button className="close" onClick={onClose} aria-label="Close">×</button>{complete ? <div className="success"><span>✓</span><p className="eyebrow">{online ? "BOOKING RECEIVED" : "SAVED OFFLINE"}</p><h2>{online ? "Your booking is ready for confirmation" : "Your booking is safe"}</h2><p>{online ? `Forex NZ will confirm the pickup and final NZ$${price} rate. ${recipient} has been saved as the recipient.` : "The booking is stored on this device and will sync automatically when your connection returns."}</p><div className="confirmation-reference"><small>DEMO BOOKING REFERENCE</small><strong>FNZ-2608-1042</strong></div><button onClick={onClose}>Return to customer portal</button></div> : <>
+  return <div className="modal-backdrop" onMouseDown={onClose}><section className="modal booking-journey" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(event) => event.stopPropagation()}><button className="close" onClick={onClose} aria-label="Close">×</button>{complete ? <div className="success"><span>✓</span><p className="eyebrow">{online ? "BOOKING RECEIVED" : "SAVED OFFLINE"}</p><h2>{online ? "Your booking is ready for confirmation" : "Your booking is safe"}</h2><p>{online ? `Forex NZ will confirm the pickup and final NZ$${price} rate. ${recipient} has been saved as the recipient.` : "The booking is stored on this device and will sync automatically when your connection returns."}</p><div className="confirmation-reference"><small>DEMO BOOKING REFERENCE</small><strong>FNZ-2608-1042</strong></div><p className="booking-contact">Questions? Email <a href="mailto:despatch@forexumac.co.nz">despatch@forexumac.co.nz</a> or call <a href="tel:+6495771383">(09) 577 1383</a>.</p><button onClick={onClose}>Return to customer portal</button></div> : <>
     <p className="eyebrow">SEND A BOX HOME</p><h2 id="booking-title">Complete your booking</h2>
     <div className="booking-progress" aria-label={`Booking step ${step} of 4`}>{["Box & pickup", "Recipient", "Declaration", "Review"].map((label, index) => <div className={index + 1 <= step ? "active" : ""} key={label}><i>{index + 1 < step ? "✓" : index + 1}</i><span>{label}</span></div>)}</div>
     {step === 1 && <form onSubmit={next}><div className="form-grid"><label>Pickup suburb<input required defaultValue="Mount Roskill" /></label><label>Destination zone<select value={destination} onChange={(event) => setDestination(event.target.value)}>{aucklandRates.map((area) => <option key={area.zone}>{area.zone}</option>)}</select></label><label>Box size<select value={boxSize} onChange={(event) => setBoxSize(event.target.value as BoxSize)}>{boxSizes.map((item) => <option value={item.key} key={item.key}>{item.name} · {item.dimensions}</option>)}</select></label><label>Preferred pickup day<input required type="date" defaultValue="2026-08-19" /></label><label>Time window<select><option>9am–12pm</option><option>12pm–3pm</option><option>3pm–6pm</option></select></label><div className="booking-price"><span>Indicative shipping rate</span><strong>NZ${price}</strong><small>Final price confirmed before booking</small></div></div><button className="confirm" type="submit">Continue to recipient <span>→</span></button></form>}
@@ -479,7 +479,7 @@ export default function Home() {
           <div><p className="eyebrow">WALANG KABA</p><h2>No more wondering where it is</h2><p>Every scan, handover, and journey update is shared across New Zealand and the Philippines—so you and your family always know what’s happening.</p><div className="trust-row"><span>✓ One shared record</span><span>✓ Real-time updates</span><span>✓ Local support at both ends</span></div></div>
         </section>
 
-        <section className="network" id="help"><p>BUILT TO GROW WITH OUR COMMUNITY</p><h2>One platform, every side connected</h2><div className="network-grid"><div><span>01</span><strong>Customers</strong><small>Book, pay, message, and track from one phone.</small></div><div><span>02</span><strong>NZ agents</strong><small>Organise pickups and customer requests.</small></div><div><span>03</span><strong>PH operations</strong><small>Prepare before each shipment arrives.</small></div><div><span>04</span><strong>Future partners</strong><small>A ready-made system for Filipino entrepreneurs.</small></div></div></section>
+        <section className="network" id="help"><p>BUILT TO GROW WITH OUR COMMUNITY</p><h2>One platform, every side connected</h2><div className="network-grid"><div><span>01</span><strong>Customers</strong><small>Book, pay, message, and track from one phone.</small></div><div><span>02</span><strong>NZ agents</strong><small>Organise pickups and customer requests.</small></div><div><span>03</span><strong>PH operations</strong><small>Prepare before each shipment arrives.</small></div><div><span>04</span><strong>Future partners</strong><small>A ready-made system for Filipino entrepreneurs.</small></div></div><div className="support-contact"><strong>Need help with a booking?</strong><a href="mailto:despatch@forexumac.co.nz">despatch@forexumac.co.nz</a><a href="tel:+6495771383">(09) 577 1383</a></div></section>
       </div>
 
       <nav className="mobile-tabbar" aria-label="App navigation">
@@ -492,7 +492,7 @@ export default function Home() {
 
       {customerNotification && <aside className="customer-notification" role="status" aria-live="polite"><span className="notification-icon">♢</span><div><small>DEMO CUSTOMER NOTIFICATION</small><strong>{customerNotification}</strong><p>In-app alert sent · Email/SMS available in the Firebase version</p></div><button onClick={() => setCustomerNotification(null)} aria-label="Dismiss notification">×</button></aside>}
 
-      <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span>Powered by DASHLY · Support · Privacy · Terms</span></footer>
+      <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span><a href="mailto:despatch@forexumac.co.nz">despatch@forexumac.co.nz</a> · <a href="tel:+6495771383">(09) 577 1383</a></span><span>Powered by DASHLY · Privacy · Terms</span></footer>
 
       {booking && <BookingJourneyModal online={online} onClose={() => setBooking(false)} onSave={(label) => saveAction("pickup-request", label)} />}
     </main>
