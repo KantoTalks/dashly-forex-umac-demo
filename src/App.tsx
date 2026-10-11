@@ -39,6 +39,36 @@ function LanguageToggle({ language, onChange }: { language: Language; onChange: 
   return <div className="language-toggle" role="group" aria-label={customerCopy[language].language}><button className={language === "en" ? "active" : ""} onClick={() => onChange("en")} aria-pressed={language === "en"}>English</button><button className={language === "tl" ? "active" : ""} onClick={() => onChange("tl")} aria-pressed={language === "tl"}>Tagalog</button></div>;
 }
 
+function DashlyFoxAssistant({ language }: { language: Language }) {
+  const [open, setOpen] = useState(false);
+  const [answer, setAnswer] = useState(language === "tl" ? "Kumusta! Ako si DASHLYFox. Matutulungan ko kayong mag-book, sumubaybay ng kahon, at tingnan ang presyo." : "Kia ora! I’m DASHLYFox. I can help you book, track a box, and understand prices.");
+  const replies = language === "tl" ? [
+    ["Paano mag-track?", "Ilagay ang tracking number sa itaas at pindutin ang Subaybayan. Para sa demo, gamitin ang BB-NZ-26081042."],
+    ["Magkano ang kahon?", "Mula Auckland papuntang Manila: Small mula NZ$55, Medium NZ$110, Large NZ$150, at Xtra Large NZ$250. Kukumpirmahin ang huling presyo bago ang booking."],
+    ["Paano mag-book?", "Pindutin ang Magpadala, piliin ang laki ng kahon at destinasyon, ilagay ang pickup at recipient details, pagkatapos ay i-review ang booking."],
+    ["Kailangan ko ng tulong", "Tumawag sa (09) 577 1383 o mag-email sa despatch@forexumac.co.nz."],
+  ] : [
+    ["How do I track?", "Enter the tracking number above and press Track. For the demo, use BB-NZ-26081042."],
+    ["How much is a box?", "From Auckland to Manila: Small from NZ$55, Medium NZ$110, Large NZ$150, and Xtra Large NZ$250. The final rate is confirmed before booking."],
+    ["How do I book?", "Press Send box, choose the box size and destination, enter pickup and recipient details, then review the booking."],
+    ["I need help", "Call (09) 577 1383 or email despatch@forexumac.co.nz."],
+  ];
+
+  useEffect(() => {
+    setAnswer(language === "tl" ? "Kumusta! Ako si DASHLYFox. Matutulungan ko kayong mag-book, sumubaybay ng kahon, at tingnan ang presyo." : "Kia ora! I’m DASHLYFox. I can help you book, track a box, and understand prices.");
+  }, [language]);
+
+  return <aside className={`dashlyfox ${open ? "open" : ""}`}>
+    {open && <section className="dashlyfox-panel" aria-label="DASHLYFox customer assistant">
+      <header><div><span>✦</span><strong>DASHLYFox</strong><small>{language === "tl" ? "Katulong sa inyong padala" : "Your shipment assistant"}</small></div><button onClick={() => setOpen(false)} aria-label="Close DASHLYFox">×</button></header>
+      <div className="dashlyfox-answer" aria-live="polite"><span>✦</span><p>{answer}</p></div>
+      <div className="dashlyfox-options">{replies.map(([question, reply]) => <button key={question} onClick={() => setAnswer(reply)}>{question}</button>)}</div>
+      <small className="dashlyfox-disclosure">{language === "tl" ? "Demo assistant · Walang tunay na customer data na ipinapadala" : "Demo assistant · No real customer data is sent"}</small>
+    </section>}
+    <button className="dashlyfox-launch" onClick={() => setOpen((value) => !value)} aria-expanded={open}><span>✦</span>{open ? (language === "tl" ? "Isara" : "Close") : (language === "tl" ? "Magtanong kay DASHLYFox" : "Ask DASHLYFox")}</button>
+  </aside>;
+}
+
 const roleCopy = {
   customer: {
     eyebrow: "Kia ora, Maria",
@@ -716,6 +746,8 @@ export default function Home() {
       </nav>
 
       {customerNotification && <aside className="customer-notification" role="status" aria-live="polite"><span className="notification-icon">♢</span><div><small>DEMO CUSTOMER NOTIFICATION</small><strong>{customerNotification}</strong><p>In-app alert sent · Email/SMS available in the Firebase version</p></div><button onClick={() => setCustomerNotification(null)} aria-label="Dismiss notification">×</button></aside>}
+
+      {role === "customer" && <DashlyFoxAssistant language={language} />}
 
       <footer><div className="brand forex-brand light"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></div><p>Made for Filipino families across Aotearoa New Zealand.</p><span><a href="mailto:despatch@forexumac.co.nz">despatch@forexumac.co.nz</a> · <a href="tel:+6495771383">(09) 577 1383</a></span><span>Powered by DASHLY · <a href="#demo">Demo</a> · Privacy · Terms</span></footer>
 
