@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
 type Role = "customer" | "agent" | "philippines";
+type Language = "en" | "tl";
 type BoxSize = "xtraLarge" | "large" | "medium" | "small";
 type StaffBookingStage = "pending" | "confirmed" | "collected" | "warehouse" | "container" | "departed" | "ph_received" | "sorted" | "out_for_delivery" | "delivered";
 
@@ -17,6 +18,26 @@ type OfflineAction = {
 const QUEUE_KEY = "padala-offline-queue-v1";
 const SYNCED_KEY = "padala-synced-events-v1";
 const LAST_SYNC_KEY = "padala-last-sync-v1";
+const LANGUAGE_KEY = "padala-language-v1";
+
+const customerCopy = {
+  en: {
+    eyebrow: "Kia ora, Maria", title: "Your care package is on its way home", subtitle: "Everything about your box—from your doorstep in Auckland to your family in Quezon City—in one calm, clear place.",
+    home: "Home", shipments: "Shipments", help: "Help", trackLabel: "Track any box", trackPlaceholder: "Enter tracking number", track: "Track", qrSample: "Use QR workflow number", autoSample: "Use automatic demo", found: "Shipment found — showing its latest journey below.", notFound: "We couldn’t find that number. Try BB-NZ-26081042 or BB-NZ-04821.",
+    portal: "Customer portal", signOut: "Sign out", activeShipment: "Active shipment", delivered: "Delivered", transit: "In transit", sentBy: "Sent by Maria", forFamily: "For Nanay & Tatay", viewJourney: "View full journey", sendBox: "Send another box", bookMinutes: "Book a pickup in minutes", contact: "Contact Forex NZ", ratesEyebrow: "Auckland shipping rates", ratesTitle: "Choose the right box for your padala", ratesIntro: "Indicative shipping prices from Auckland to the Philippines.", bookBox: "Book a box", destination: "Destination", from: "From", ratesNotice: "Prices are indicative “from” rates for Auckland and are subject to change without prior notice. Forex NZ confirms the final price before booking.",
+    sendBoxNav: "Send box", support: "Support", logOut: "Log out", english: "English", tagalog: "Tagalog", language: "Language",
+  },
+  tl: {
+    eyebrow: "Kumusta, Maria", title: "Pauwi na ang inyong padala", subtitle: "Lahat ng impormasyon tungkol sa inyong kahon—mula sa pintuan ninyo sa Auckland hanggang sa pamilya ninyo sa Quezon City—ay nasa isang malinaw at madaling gamitin na lugar.",
+    home: "Home", shipments: "Mga Padala", help: "Tulong", trackLabel: "Subaybayan ang kahon", trackPlaceholder: "Ilagay ang tracking number", track: "Subaybayan", qrSample: "Gamitin ang QR demo number", autoSample: "Gamitin ang awtomatikong demo", found: "Nakita ang padala — narito ang pinakabagong biyahe nito.", notFound: "Hindi nakita ang numerong iyon. Subukan ang BB-NZ-26081042 o BB-NZ-04821.",
+    portal: "Portal ng customer", signOut: "Mag-sign out", activeShipment: "Aktibong padala", delivered: "Naihatid na", transit: "Bumibiyahe", sentBy: "Ipinadala ni Maria", forFamily: "Para kina Nanay at Tatay", viewJourney: "Tingnan ang buong biyahe", sendBox: "Magpadala ng isa pang kahon", bookMinutes: "Mag-book ng pickup sa ilang minuto", contact: "Makipag-ugnayan sa Forex NZ", ratesEyebrow: "Mga presyo mula Auckland", ratesTitle: "Piliin ang tamang kahon para sa inyong padala", ratesIntro: "Tinatayang presyo ng pagpapadala mula Auckland papuntang Pilipinas.", bookBox: "Mag-book ng kahon", destination: "Destinasyon", from: "Mula", ratesNotice: "Ang mga presyong ito ay tantiyang panimulang presyo mula Auckland at maaaring magbago. Kukumpirmahin ng Forex NZ ang huling presyo bago ang booking.",
+    sendBoxNav: "Magpadala", support: "Tulong", logOut: "Lumabas", english: "English", tagalog: "Tagalog", language: "Wika",
+  },
+} as const;
+
+function LanguageToggle({ language, onChange }: { language: Language; onChange: (language: Language) => void }) {
+  return <div className="language-toggle" role="group" aria-label={customerCopy[language].language}><button className={language === "en" ? "active" : ""} onClick={() => onChange("en")} aria-pressed={language === "en"}>English</button><button className={language === "tl" ? "active" : ""} onClick={() => onChange("tl")} aria-pressed={language === "tl"}>Tagalog</button></div>;
+}
 
 const roleCopy = {
   customer: {
@@ -190,7 +211,8 @@ function DemoJourneyPage({ onClose }: { onClose: () => void }) {
   );
 }
 
-function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext, trackingNumber, trackingResult, staffBookingStage }: { onBook: () => void; trackingStage: number; trackingActive: boolean; secondsToNext: number; trackingNumber: string; trackingResult: "idle" | "found" | "not-found"; staffBookingStage: StaffBookingStage }) {
+function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext, trackingNumber, trackingResult, staffBookingStage, language }: { onBook: () => void; trackingStage: number; trackingActive: boolean; secondsToNext: number; trackingNumber: string; trackingResult: "idle" | "found" | "not-found"; staffBookingStage: StaffBookingStage; language: Language }) {
+  const t = customerCopy[language];
   const isStaffShipment = trackingResult === "found" && trackingNumber === "BB-NZ-26081042";
   const visibleMilestones = isStaffShipment ? staffShipmentMilestones : milestones;
   const visibleStage = isStaffShipment ? staffStageToTracking[staffBookingStage] : trackingStage;
@@ -202,15 +224,15 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext, tr
       <section className="shipment-card" id="shipment-result">
         <div className="shipment-top">
           <div>
-            <p className="label">ACTIVE SHIPMENT</p>
+            <p className="label">{t.activeShipment}</p>
             <h2>{isStaffShipment ? "BB-NZ-26081042" : "BB-NZ-04821"}</h2>
           </div>
-          <span className={`status-pill ${delivered ? "delivered" : ""}`}><i /> {delivered ? "Delivered" : "In transit"}</span>
+          <span className={`status-pill ${delivered ? "delivered" : ""}`}><i /> {delivered ? t.delivered : t.transit}</span>
         </div>
         <div className="route-line" aria-label="Auckland to Quezon City">
-          <div><span>NZ</span><strong>Auckland</strong><small>Sent by Maria</small></div>
+          <div><span>NZ</span><strong>Auckland</strong><small>{t.sentBy}</small></div>
           <div className="ocean"><b style={{ left: `${markerPositions[visibleStage]}%` }}>✦</b></div>
-          <div className="destination"><span>PH</span><strong>Quezon City</strong><small>For Nanay & Tatay</small></div>
+          <div className="destination"><span>PH</span><strong>Quezon City</strong><small>{t.forFamily}</small></div>
         </div>
         <div className="eta"><span>{delivered ? "Delivery confirmed" : isStaffShipment ? "Live QR status" : trackingActive ? "Live shipment update" : "Current demo stage"}</span><strong>{delivered ? "Delivered to Nanay & Tatay" : currentStatus.label}</strong><em>{delivered ? "Journey complete ✓" : isStaffShipment ? "Updated by authorised staff scans" : trackingActive ? `Next demo update in ${secondsToNext}s` : "Enter the demo number to begin"}</em></div>
         <div className={`timeline ${isStaffShipment ? "staff-stages" : ""}`}>
@@ -223,28 +245,28 @@ function CustomerView({ onBook, trackingStage, trackingActive, secondsToNext, tr
           ))}
         </div>
         {isStaffShipment ? <p className="tracking-live" role="status"><i /> Connected to staff QR events — the status changes when authorised staff scan the box.</p> : trackingActive && <p className="tracking-live" role="status"><i /> Live demonstration running — this shipment advances automatically every 30 seconds.</p>}
-        <button className="text-button">View full journey <span>→</span></button>
+        <button className="text-button">{t.viewJourney} <span>→</span></button>
       </section>
 
       <section className="quick-grid">
         <button className="quick-card primary" onClick={onBook}>
-          <span className="quick-icon">＋</span><div><strong>Send another box</strong><small>Book a pickup in minutes</small></div><b>→</b>
+          <span className="quick-icon">＋</span><div><strong>{t.sendBox}</strong><small>{t.bookMinutes}</small></div><b>→</b>
         </button>
         <a className="quick-card" href="mailto:despatch@forexumac.co.nz">
-          <span className="quick-icon">⌁</span><div><strong>Contact Forex NZ</strong><small>despatch@forexumac.co.nz · (09) 577 1383</small></div><i className="online" />
+          <span className="quick-icon">⌁</span><div><strong>{t.contact}</strong><small>despatch@forexumac.co.nz · (09) 577 1383</small></div><i className="online" />
         </a>
       </section>
 
       <section className="rates-guide" aria-labelledby="rates-title">
-        <div className="rates-heading"><div><p className="eyebrow">AUCKLAND SHIPPING RATES</p><h2 id="rates-title">Choose the right box for your padala</h2><p>Indicative shipping prices from Auckland to the Philippines.</p></div><button onClick={onBook}>Book a box <span>→</span></button></div>
+        <div className="rates-heading"><div><p className="eyebrow">{t.ratesEyebrow}</p><h2 id="rates-title">{t.ratesTitle}</h2><p>{t.ratesIntro}</p></div><button onClick={onBook}>{t.bookBox} <span>→</span></button></div>
         <div className="box-size-grid">
-          {boxSizes.map((box) => <article key={box.key}><span className={`box-illustration ${box.key}`} aria-hidden="true">▣</span><strong>{box.name}</strong><small>{box.dimensions}</small><b>From NZ${aucklandRates[0].rates[box.key]}</b></article>)}
+          {boxSizes.map((box) => <article key={box.key}><span className={`box-illustration ${box.key}`} aria-hidden="true">▣</span><strong>{box.name}</strong><small>{box.dimensions}</small><b>{t.from} NZ${aucklandRates[0].rates[box.key]}</b></article>)}
         </div>
         <div className="rates-table-wrap">
-          <div className="rates-table rates-row rates-head"><span>Destination</span>{boxSizes.map((box) => <span key={box.key}>{box.name}</span>)}</div>
+          <div className="rates-table rates-row rates-head"><span>{t.destination}</span>{boxSizes.map((box) => <span key={box.key}>{box.name}</span>)}</div>
           {aucklandRates.map((area) => <div className="rates-table rates-row" key={area.zone}><span><strong>{area.zone}</strong><small>{area.examples}</small></span>{boxSizes.map((box) => <span key={box.key}>NZ${area.rates[box.key]}</span>)}</div>)}
         </div>
-        <p className="rates-notice">Prices are indicative “from” rates for Auckland and are subject to change without prior notice. Forex NZ confirms the final price before booking.</p>
+        <p className="rates-notice">{t.ratesNotice}</p>
       </section>
     </>
   );
@@ -391,6 +413,7 @@ function PhilippinesView({ bookingStage, onAdvance }: { bookingStage: StaffBooki
 
 export default function Home() {
   const [showDemo, setShowDemo] = useState(() => window.location.hash === "#demo");
+  const [language, setLanguage] = useState<Language>(() => (localStorage.getItem(LANGUAGE_KEY) as Language | null) || "en");
   const [role, setRole] = useState<Role>("customer");
   const [authenticated, setAuthenticated] = useState(false);
   const [loginMode, setLoginMode] = useState<"customer" | "staff">("customer");
@@ -411,7 +434,8 @@ export default function Home() {
   const [agentDone, setAgentDone] = useState<string[]>([]);
   const [staffBookingStage, setStaffBookingStage] = useState<StaffBookingStage>("pending");
   const [syncing, setSyncing] = useState(false);
-  const copy = roleCopy[role];
+  const t = customerCopy[language];
+  const copy = role === "customer" ? { eyebrow: t.eyebrow, title: t.title, subtitle: t.subtitle } : roleCopy[role];
   const agentVisibleStage: StaffBookingStage = ["ph_received", "sorted", "out_for_delivery", "delivered"].includes(staffBookingStage) ? "departed" : staffBookingStage;
 
   useEffect(() => {
@@ -419,6 +443,11 @@ export default function Home() {
     window.addEventListener("hashchange", updateDemoRoute);
     return () => window.removeEventListener("hashchange", updateDemoRoute);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LANGUAGE_KEY, language);
+    document.documentElement.lang = language === "tl" ? "tl" : "en";
+  }, [language]);
 
   const queuedChanges = queue.length;
 
@@ -609,6 +638,7 @@ export default function Home() {
         </section>
         <section className="login-panel" aria-labelledby="login-title">
           <div className="login-card">
+            {loginMode === "customer" && <LanguageToggle language={language} onChange={setLanguage} />}
             <p className="label">{customerAuthView === "signup" && loginMode === "customer" ? "NEW CUSTOMER" : "WELCOME BACK"}</p><h2 id="login-title">{customerAuthView === "signup" && loginMode === "customer" ? "Create your Forex NZ account" : "Sign in to Forex NZ"}</h2><p>{customerAuthView === "signup" && loginMode === "customer" ? "Set up your customer profile, pickup address and preferred notifications." : "This demonstration shows how access will be separated in the functional MVP."}</p>
             <div className="login-tabs" role="tablist"><button className={loginMode === "customer" ? "active" : ""} onClick={() => { setLoginMode("customer"); setAuthNotice(null); }}>Customer</button><button className={loginMode === "staff" ? "active" : ""} onClick={() => { setLoginMode("staff"); setCustomerAuthView("signin"); setAuthNotice(null); }}>Staff access</button></div>
             {loginMode === "customer" && customerAuthView === "signup" ? <form className="signup-form" onSubmit={(event) => { event.preventDefault(); setRole("customer"); setAuthenticated(true); setCustomerNotification("Welcome to Forex NZ, Maria! Your demo customer account is ready."); }}>
@@ -636,11 +666,12 @@ export default function Home() {
     <main className="app-home">
       <header className="topbar">
         <a className="brand forex-brand" href="#" aria-label="Forex NZ Freight Forwarder"><img src="./forex-umac-logo.jpg" alt="Forex NZ Freight Forwarder" /></a>
-        <nav aria-label="Main navigation"><a className="active" href="#home">Home</a><a href="#journey">Shipments</a><a href="#help">Help</a></nav>
+        <nav aria-label="Main navigation"><a className="active" href="#home">{role === "customer" ? t.home : "Home"}</a><a href="#journey">{role === "customer" ? t.shipments : "Shipments"}</a><a href="#help">{role === "customer" ? t.help : "Help"}</a></nav>
         <div className="header-actions">
+          {role === "customer" && <LanguageToggle language={language} onChange={setLanguage} />}
           <span className={`connection-pill ${online ? "is-online" : "is-offline"}`}><i />{syncing ? "Syncing…" : online ? (queuedChanges ? `Online · ${queuedChanges} syncing` : "Online · synced") : `Offline${queuedChanges ? ` · ${queuedChanges} queued` : ""}`}</span>
-          <span className="access-badge">{role === "customer" ? "Customer portal" : role === "agent" ? "NZ Agent" : "PH Operations"}</span>
-          <button className="sign-out" onClick={() => setAuthenticated(false)}>Sign out</button>
+          <span className="access-badge">{role === "customer" ? t.portal : role === "agent" ? "NZ Agent" : "PH Operations"}</span>
+          <button className="sign-out" onClick={() => setAuthenticated(false)}>{role === "customer" ? t.signOut : "Sign out"}</button>
           <button className="bell" aria-label="Notifications">♢<i /></button><div className="avatar">MS</div>
         </div>
       </header>
@@ -648,10 +679,10 @@ export default function Home() {
       <div className="page-shell" id="home">
         <section className="hero-copy">
           <div><p className="eyebrow">{copy.eyebrow}</p><h1>{copy.title}</h1><p>{copy.subtitle}</p></div>
-          {role === "customer" && <form className="track-box" onSubmit={(event) => { event.preventDefault(); trackShipment(); }}><label htmlFor="tracking">Track any box</label><div><input id="tracking" value={tracking} onChange={(e) => { setTracking(e.target.value); setTrackingResult("idle"); }} placeholder="Enter tracking number"/><button type="submit">Track <span>→</span></button></div><button className="sample-tracking" type="button" onClick={() => { setTracking("BB-NZ-26081042"); setTrackingResult("idle"); }}>Use QR workflow number: <strong>BB-NZ-26081042</strong></button><button className="sample-tracking secondary-sample" type="button" onClick={() => { setTracking("BB-NZ-04821"); setTrackingResult("idle"); }}>Use automatic demo: <strong>BB-NZ-04821</strong></button>{trackingResult === "found" && <p className="tracking-message found" role="status">✓ Shipment found — showing its latest journey below.</p>}{trackingResult === "not-found" && <p className="tracking-message not-found" role="alert">We couldn’t find that number. Try BB-NZ-26081042 or BB-NZ-04821.</p>}</form>}
+          {role === "customer" && <form className="track-box" onSubmit={(event) => { event.preventDefault(); trackShipment(); }}><label htmlFor="tracking">{t.trackLabel}</label><div><input id="tracking" value={tracking} onChange={(e) => { setTracking(e.target.value); setTrackingResult("idle"); }} placeholder={t.trackPlaceholder}/><button type="submit">{t.track} <span>→</span></button></div><button className="sample-tracking" type="button" onClick={() => { setTracking("BB-NZ-26081042"); setTrackingResult("idle"); }}>{t.qrSample}: <strong>BB-NZ-26081042</strong></button><button className="sample-tracking secondary-sample" type="button" onClick={() => { setTracking("BB-NZ-04821"); setTrackingResult("idle"); }}>{t.autoSample}: <strong>BB-NZ-04821</strong></button>{trackingResult === "found" && <p className="tracking-message found" role="status">✓ {t.found}</p>}{trackingResult === "not-found" && <p className="tracking-message not-found" role="alert">{t.notFound}</p>}</form>}
         </section>
 
-        {role === "customer" ? <><CustomerView onBook={() => setBooking(true)} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} trackingNumber={tracking} trackingResult={trackingResult} staffBookingStage={staffBookingStage} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} bookingStage={agentVisibleStage} onConfirmBooking={confirmStaffBooking} onAdvanceBooking={advanceStaffBooking} onResetBooking={() => setStaffBookingStage("pending")} /> : <PhilippinesView bookingStage={staffBookingStage} onAdvance={advancePhilippinesBooking} />}
+        {role === "customer" ? <><CustomerView onBook={() => setBooking(true)} trackingStage={trackingStage} trackingActive={trackingActive} secondsToNext={secondsToNext} trackingNumber={tracking} trackingResult={trackingResult} staffBookingStage={staffBookingStage} language={language} /><JourneyAnimation /></> : role === "agent" ? <AgentView done={agentDone} onToggle={toggleCollected} bookingStage={agentVisibleStage} onConfirmBooking={confirmStaffBooking} onAdvanceBooking={advanceStaffBooking} onResetBooking={() => setStaffBookingStage("pending")} /> : <PhilippinesView bookingStage={staffBookingStage} onAdvance={advancePhilippinesBooking} />}
 
         <section className="offline-feature" aria-labelledby="offline-title">
           <div className="offline-copy">
@@ -677,11 +708,11 @@ export default function Home() {
       </div>
 
       <nav className="mobile-tabbar" aria-label="App navigation">
-        <a className="active" href="#home"><span>⌂</span><small>Home</small></a>
-        <a href="#journey"><span>▣</span><small>Shipments</small></a>
-        <button onClick={() => setBooking(true)}><span className="tab-action">＋</span><small>Send box</small></button>
-        <a href="#help"><span>◌</span><small>Support</small></a>
-        <button className="mobile-logout" onClick={() => setAuthenticated(false)}><span>↪</span><small>Log out</small></button>
+        <a className="active" href="#home"><span>⌂</span><small>{role === "customer" ? t.home : "Home"}</small></a>
+        <a href="#journey"><span>▣</span><small>{role === "customer" ? t.shipments : "Shipments"}</small></a>
+        <button onClick={() => setBooking(true)}><span className="tab-action">＋</span><small>{role === "customer" ? t.sendBoxNav : "Send box"}</small></button>
+        <a href="#help"><span>◌</span><small>{role === "customer" ? t.support : "Support"}</small></a>
+        <button className="mobile-logout" onClick={() => setAuthenticated(false)}><span>↪</span><small>{role === "customer" ? t.logOut : "Log out"}</small></button>
       </nav>
 
       {customerNotification && <aside className="customer-notification" role="status" aria-live="polite"><span className="notification-icon">♢</span><div><small>DEMO CUSTOMER NOTIFICATION</small><strong>{customerNotification}</strong><p>In-app alert sent · Email/SMS available in the Firebase version</p></div><button onClick={() => setCustomerNotification(null)} aria-label="Dismiss notification">×</button></aside>}

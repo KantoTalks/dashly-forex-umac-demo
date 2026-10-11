@@ -25,6 +25,7 @@ footer .forex-brand img{width:180px;height:58px;border-radius:6px}
 .topbar nav a{color:#6b7e80;text-decoration:none;font-size:14px;font-weight:700;padding:30px 0 26px;border-bottom:3px solid transparent}
 .topbar nav a.active{color:var(--navy);border-color:var(--orange)}
 .header-actions{display:flex;align-items:center;gap:15px;min-width:300px;justify-content:flex-end}
+.language-toggle{display:inline-flex;align-items:center;padding:3px;border:1px solid var(--line);border-radius:999px;background:#f1f7fb;white-space:nowrap}.language-toggle button{min-height:30px;border:0;border-radius:999px;background:transparent;color:var(--muted);padding:5px 9px;font-size:9px;font-weight:900}.language-toggle button.active{background:var(--navy);color:white}.login-card>.language-toggle{float:right;margin:0 0 12px 12px}
 .role-select{display:flex;align-items:center;gap:8px;border-right:1px solid var(--line);padding-right:15px}
 .role-select span{font-size:11px;color:var(--muted)}
 .role-select select{border:0;background:transparent;color:var(--navy);font-size:12px;font-weight:800}
@@ -304,6 +305,7 @@ footer{gap:25px;flex-wrap:wrap}
 }
 
 @media(max-width:520px){.shipment-card,.operations-card{padding:22px 18px}
+.app-home .language-toggle{position:fixed;right:14px;bottom:92px;z-index:35;box-shadow:0 8px 24px rgba(24,44,114,.18);background:white}.app-home .language-toggle button{min-height:36px;font-size:10px}
 .demo-header{height:70px;padding:0 16px}.demo-header .forex-brand{min-width:0}.demo-header .forex-brand img{width:145px;height:48px}.demo-header>div span{display:none}.demo-header button{padding:9px 11px;font-size:11px}.demo-hero{padding:42px 20px 25px}.demo-hero h1{font-size:34px}.demo-shell{padding:0 12px}.demo-disclosure{margin:0 12px 32px;align-items:flex-start;flex-direction:column;gap:5px}
 .staff-booking-card{padding:22px 18px}.staff-booking-head{display:block}.staff-status{display:inline-block;margin-top:12px}.staff-booking-grid,.staff-review-panel{grid-template-columns:1fr}.staff-review-panel .review-check,.staff-review-panel button{grid-column:1}.qr-actions>button{display:block;width:100%;margin:8px 0}
 .staff-flow{overflow-x:auto;grid-template-columns:repeat(5,92px);padding-bottom:8px}.staff-flow>div{align-items:flex-start;flex-direction:column}.staff-flow>div:after{left:24px;right:-24px}
