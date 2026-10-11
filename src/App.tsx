@@ -41,6 +41,7 @@ function LanguageToggle({ language, onChange }: { language: Language; onChange: 
 
 function DashlyFoxAssistant({ language }: { language: Language }) {
   const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
   const [answer, setAnswer] = useState(language === "tl" ? "Kumusta! Ako si DASHLYFox. Matutulungan ko kayong mag-book, sumubaybay ng kahon, at tingnan ang presyo." : "Kia ora! I’m DASHLYFox. I can help you book, track a box, and understand prices.");
   const replies = language === "tl" ? [
     ["Paano mag-track?", "Ilagay ang tracking number sa itaas at pindutin ang Subaybayan. Para sa demo, gamitin ang BB-NZ-26081042."],
@@ -58,10 +59,20 @@ function DashlyFoxAssistant({ language }: { language: Language }) {
     setAnswer(language === "tl" ? "Kumusta! Ako si DASHLYFox. Matutulungan ko kayong mag-book, sumubaybay ng kahon, at tingnan ang presyo." : "Kia ora! I’m DASHLYFox. I can help you book, track a box, and understand prices.");
   }, [language]);
 
+  const sendMessage = (event: FormEvent) => {
+    event.preventDefault();
+    const text = message.trim().toLowerCase();
+    if (!text) return;
+    const reply = /track|subaybay|nasaan|where/.test(text) ? replies[0][1] : /price|cost|magkano|presyo|rate/.test(text) ? replies[1][1] : /book|pickup|padala|send/.test(text) ? replies[2][1] : /help|tulong|contact|call|email/.test(text) ? replies[3][1] : language === "tl" ? "Sa live AI version, masasagot ko ang malayang English, Tagalog at Taglish. Para sa demo, itanong ang tracking, presyo, booking o tulong." : "In the live AI version, I can answer free-form English, Tagalog and Taglish. For this demo, ask about tracking, prices, booking or help.";
+    setAnswer(reply);
+    setMessage("");
+  };
+
   return <aside className={`dashlyfox ${open ? "open" : ""}`}>
     {open && <section className="dashlyfox-panel" aria-label="DASHLYFox customer assistant">
       <header><div><span>✦</span><strong>DASHLYFox</strong><small>{language === "tl" ? "Katulong sa inyong padala" : "Your shipment assistant"}</small></div><button onClick={() => setOpen(false)} aria-label="Close DASHLYFox">×</button></header>
       <div className="dashlyfox-answer" aria-live="polite"><span>✦</span><p>{answer}</p></div>
+      <form className="dashlyfox-compose" onSubmit={sendMessage}><label htmlFor="dashlyfox-message">{language === "tl" ? "I-type ang inyong tanong" : "Type your question"}</label><div><input id="dashlyfox-message" value={message} onChange={(event) => setMessage(event.target.value)} placeholder={language === "tl" ? "Halimbawa: Magkano ang large box?" : "For example: How much is a large box?"}/><button type="submit">{language === "tl" ? "Ipadala" : "Send"}</button></div></form>
       <div className="dashlyfox-options">{replies.map(([question, reply]) => <button key={question} onClick={() => setAnswer(reply)}>{question}</button>)}</div>
       <small className="dashlyfox-disclosure">{language === "tl" ? "Demo assistant · Walang tunay na customer data na ipinapadala" : "Demo assistant · No real customer data is sent"}</small>
     </section>}
